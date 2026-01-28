@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma</title>
+
+  <!-- ICONOS PROFESIONALES -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="day">
+
+  <header class="top-bar">
+    <div class="left">
+      <button id="backBtn" class="glass-btn hidden">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 id="title">Países</h1>
+    </div>
+
+    <button id="themeToggle" class="glass-btn icon-only">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </header>
+
+  <main id="container"></main>
+
+  <!-- IMPORTANTE: ORDEN -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

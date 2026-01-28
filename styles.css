@@ -1,0 +1,111 @@
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  transition: background 0.4s;
+}
+
+/* ===== FONDOS POR MODO ===== */
+body.day {
+  background: url("alamosday.jpg")
+    center / cover fixed no-repeat;
+}
+
+body.night {
+  background: url("alamosnight.jpg")
+    center / cover fixed no-repeat;
+}
+
+/* ===== HEADER FIJO ===== */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+h1 {
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* ===== CONTENIDO ===== */
+main {
+  padding-top: 120px; /* CLAVE: evita que se escondan los botones */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ===== BOTONES GLASS ===== */
+.glass-btn {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  transition: 0.25s;
+}
+
+.glass-btn:hover {
+  transform: translateY(-3px);
+}
+
+.icon-only {
+  padding: 0.7rem;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== MODO NOCHE ===== */
+body.night .glass-btn {
+  background: rgba(0,0,0,0.45);
+  color: white;
+}
+
+/* ===== IMÁGENES EN BOTONES ===== */
+.card-img {
+  width: 90px;          /* tamaño fijo */
+  height: 60px;         /* tamaño fijo */
+  object-fit: cover;    /* recorta sin deformar */
+  border-radius: 999px; /* súper redondeado */
+  opacity: 0.55;
+  flex-shrink: 0;       /* evita que se estire */
+}
+/* ===== TEXTO PAÍSES ===== */
+.country-btn span {
+  font-size: 1.18rem;   /* más grande */
+  font-weight: 700;     /* negrita */
+  letter-spacing: 0.5px;
+}
+/* ===== TÍTULO SEGÚN MODO ===== */
+body.day h1 {
+  color: #111; /* oscuro para día */
+}
+
+body.night h1 {
+  color: #fff; /* claro para noche */
+}
