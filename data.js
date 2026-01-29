@@ -22,7 +22,7 @@ const data = {
   Uruguay: {
     image: "https://flagcdn.com/w320/uy.png",
     teams: {
-        FoodHunters: {
+      FoodHunters: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/food-hunters/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_maren.png"
       }
@@ -48,11 +48,4 @@ const data = {
       }
     }
   }
-
 };
-
-
-
-
-
-

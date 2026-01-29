@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hunters Den</title>
 
-  <!-- ICONOS PROFESIONALES -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <!-- ICONOS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body class="day">
 
   <header class="top-bar">
@@ -18,7 +21,11 @@
       <button id="backBtn" class="glass-btn hidden">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <h1 id="title">Países</h1>
+
+      <h1 id="title">
+        <span id="titleText">Países</span>
+        <img id="titleFlag" class="title-flag hidden" />
+      </h1>
     </div>
 
     <button id="themeToggle" class="glass-btn icon-only">
@@ -28,9 +35,8 @@
 
   <main id="container"></main>
 
-  <!-- IMPORTANTE: ORDEN -->
+  <!-- ORDEN IMPORTANTE -->
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
-
 </html>
