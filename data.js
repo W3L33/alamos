@@ -2,11 +2,27 @@ const data = {
   Argentina: {
     image: "https://flagcdn.com/w320/ar.png",
     teams: {
-      Equipo1: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
+      Diego: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
         image: "hd.jpg"
       },
       Equipo2: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
+        image: "hd.jpg"
+      },
+      Equipo3: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
+        image: "hd.jpg"
+      },
+        Equipo4: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
+        image: "hd.jpg"
+      },
+        Equipo5: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
+        image: "hd.jpg"
+      },
+      Equipo6: {
         link: "argentina-equipo2.html",
         image: "hd.jpg"
       }
@@ -60,4 +76,5 @@ const data = {
       }
     }
   }
+
 };
