@@ -14,11 +14,11 @@ const data = {
     teams: {
       SuperCorn: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/restaurante/inicio?authuser=0",
-        image: ""
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_supercorn.png"
       },
          SuperKernel: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/the-super-kernel/inicio?authuser=0",
-        image: ""
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_kernel.png"
       }
     }
   },
@@ -54,3 +54,4 @@ const data = {
   }
 
 };
+
