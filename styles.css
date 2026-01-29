@@ -127,6 +127,22 @@ body.night h1 {
   color: #fff;
 }
 
+/* ===== ANIMACIÓN TÍTULO (NUEVO) ===== */
+.title-animate {
+  animation: slideFadeIn 0.45s ease forwards;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (orientation: landscape) {
   main {

@@ -5,7 +5,7 @@ const themeToggle = document.getElementById("themeToggle");
 const titleText = document.getElementById("titleText");
 const titleFlag = document.getElementById("titleFlag");
 
-/*PRELOAD DE FONDOS */
+/* PRELOAD DE FONDOS */
 function preloadImages(urls) {
   urls.forEach(url => {
     const img = new Image();
@@ -17,11 +17,16 @@ preloadImages([
   "alamosday.jpg",
   "alamosnight.jpg"
 ]);
+
 function renderCountries() {
   container.innerHTML = "";
   titleText.textContent = "Países";
   titleFlag.classList.add("hidden");
   backBtn.classList.add("hidden");
+
+  /* limpiar animación */
+  titleText.classList.remove("title-animate");
+  titleFlag.classList.remove("title-animate");
 
   for (const country in data) {
     const btn = document.createElement("button");
@@ -43,6 +48,17 @@ function renderTeams(country) {
   titleFlag.src = data[country].image;
   titleFlag.classList.remove("hidden");
   backBtn.classList.remove("hidden");
+
+  /* reiniciar animación */
+  titleText.classList.remove("title-animate");
+  titleFlag.classList.remove("title-animate");
+
+  /* forzar reflow */
+  void titleText.offsetWidth;
+
+  /* aplicar animación */
+  titleText.classList.add("title-animate");
+  titleFlag.classList.add("title-animate");
 
   const teams = data[country].teams;
 
