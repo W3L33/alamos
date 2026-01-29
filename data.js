@@ -2,7 +2,7 @@ const data = {
   Argentina: {
     image: "https://flagcdn.com/w320/ar.png",
     teams: {
-      Diego: {
+      Kadever: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_diego.png"
       },
@@ -78,6 +78,7 @@ const data = {
   }
 
 };
+
 
 
 
