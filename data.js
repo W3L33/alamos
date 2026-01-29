@@ -36,9 +36,9 @@ const data = {
   EEUU: {
     image: "https://flagcdn.com/w320/us.png",
     teams: {
-      Equipo1: {
-        link: "",
-        image: ""
+      FlashClean: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/flash-clean/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_flashclean.jpg"
       }
     }
   },
@@ -54,4 +54,5 @@ const data = {
   }
 
 };
+
 
