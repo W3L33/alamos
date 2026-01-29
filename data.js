@@ -5,26 +5,6 @@ const data = {
       Kadever: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_diego.png"
-      },
-      Equipo2: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-      Equipo3: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-        Equipo4: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-        Equipo5: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-      Equipo6: {
-        link: "argentina-equipo2.html",
-        image: "hd.jpg"
       }
     }
   },
@@ -33,12 +13,8 @@ const data = {
     image: "https://flagcdn.com/w320/pt.png",
     teams: {
       Equipo1: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-      Equipo2: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
+        link: "",
+        image: ""
       }
     }
   },
@@ -49,10 +25,6 @@ const data = {
         FoodHunters: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/food-hunters/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_maren.png"
-      },
-      Equipo1: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
       }
     }
   },
@@ -61,12 +33,8 @@ const data = {
     image: "https://flagcdn.com/w320/us.png",
     teams: {
       Equipo1: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
-      },
-      Equipo2: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
+        link: "",
+        image: ""
       }
     }
   },
@@ -75,13 +43,14 @@ const data = {
     image: "https://flagcdn.com/w320/kr.png",
     teams: {
       Equipo1: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
-        image: "hd.jpg"
+        link: "",
+        image: ""
       }
     }
   }
 
 };
+
 
 
 
