@@ -4,7 +4,7 @@ const data = {
     teams: {
       Diego: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
-        image: "hd.jpg"
+        image: "imgp/arg_diego.jpg"
       },
       Equipo2: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/welee/inicio",
@@ -78,3 +78,4 @@ const data = {
   }
 
 };
+
