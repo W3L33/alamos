@@ -12,8 +12,12 @@ const data = {
   Portugal: {
     image: "https://flagcdn.com/w320/pt.png",
     teams: {
-      Equipo1: {
-        link: "",
+      SuperCorn: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/restaurante/inicio?authuser=0",
+        image: ""
+      },
+         SuperKernel: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/the-super-kernel/inicio?authuser=0",
         image: ""
       }
     }
@@ -48,4 +52,5 @@ const data = {
       }
     }
   }
+
 };
