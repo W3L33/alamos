@@ -18,15 +18,45 @@ preloadImages([
   "alamosnight.jpg"
 ]);
 
-function renderCountries() {
+/* ===== ESTADO ===== */
+let isInCountryView = false;
+
+/* ===== SWIPE ===== */
+let touchStartX = 0;
+let touchEndX = 0;
+
+function handleSwipe() {
+  const deltaX = touchEndX - touchStartX;
+
+  if (deltaX > 80 && isInCountryView) {
+    renderCountries(true);
+  }
+}
+
+document.addEventListener("touchstart", e => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener("touchend", e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+
+function renderCountries(animate = false) {
+  isInCountryView = false;
+
   container.innerHTML = "";
   titleText.textContent = "Países";
   titleFlag.classList.add("hidden");
   backBtn.classList.add("hidden");
 
-  /* limpiar animación */
   titleText.classList.remove("title-animate");
   titleFlag.classList.remove("title-animate");
+
+  if (animate) {
+    void titleText.offsetWidth;
+    titleText.classList.add("title-animate");
+  }
 
   for (const country in data) {
     const btn = document.createElement("button");
@@ -43,20 +73,19 @@ function renderCountries() {
 }
 
 function renderTeams(country) {
+  isInCountryView = true;
+
   container.innerHTML = "";
   titleText.textContent = country;
   titleFlag.src = data[country].image;
   titleFlag.classList.remove("hidden");
   backBtn.classList.remove("hidden");
 
-  /* reiniciar animación */
   titleText.classList.remove("title-animate");
   titleFlag.classList.remove("title-animate");
 
-  /* forzar reflow */
   void titleText.offsetWidth;
 
-  /* aplicar animación */
   titleText.classList.add("title-animate");
   titleFlag.classList.add("title-animate");
 
@@ -79,7 +108,7 @@ function renderTeams(country) {
   }
 }
 
-backBtn.onclick = renderCountries;
+backBtn.onclick = () => renderCountries(true);
 
 themeToggle.onclick = () => {
   const icon = themeToggle.querySelector("i");
@@ -91,4 +120,5 @@ themeToggle.onclick = () => {
     : "fa-solid fa-moon";
 };
 
-renderCountries();
+/* animar título inicial */
+renderCountries(true);
