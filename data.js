@@ -39,6 +39,22 @@ const data = {
              CleanVibesss: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/restaurante-y-menu/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_cleanvibes.png"
+      },
+             StrangerWaffles: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/sahily-chable/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_stanger.png"
+      },
+  SmellSlayer: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/thesmellslayer/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_slayer.png"
+      },
+  CupCakes: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/restaurante-y-menu/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_cupcakes.jpg"
+      },
+  BadHunger: {
+        link: "",
+        image: ""
       }
     }
   },
@@ -102,9 +118,29 @@ const data = {
   Corea: {
     image: "https://flagcdn.com/w320/kr.png",
     teams: {
-      Equipo1: {
-        link: "",
-        image: ""
+      infinity: {
+        link: "https://sites.google.com/view/infinitypage/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_infinity.jpg"
+      },
+      Aquaman: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/aquaman-jellies/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_aquaman.jpg"
+      },
+     Brownies: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/brownies-delights/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_brownies.png"
+      },
+     ByeSpot: {
+        link: "https://portaldomarketing.net/525-2/?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_byespot.png"
+      },
+     SylverSurfer: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/silver-surfer-soaps/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_sylversurfer.png"
+      },
+     Aqualoe: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/aqualoe/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_aqualoe.png"
       }
     }
   }
