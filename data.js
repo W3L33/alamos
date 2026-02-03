@@ -9,6 +9,18 @@ const data = {
         SuperDinamite: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/super/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_superdinamite.png"
+      },
+        Crepes: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/crepes/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_crepes.jpg"
+      },
+        Nakasso: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/nakassoperfumes/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_nakasso.png"
+      },
+        OatsMan: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/oats-man/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_oatsman.png"
       }
     }
   },
@@ -45,6 +57,14 @@ const data = {
       BlackWidow: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/huntersproject/inicio?authuser=0",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_blackwidow.png"
+      },
+      MrHotCake: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/mrhotcakefantastic/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_mrhotcake.png"
+      },
+      SuperFresh: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/proyectodeingles/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_superfresh.png"
       }
     }
   },
@@ -90,7 +110,6 @@ const data = {
   }
 
 };
-
 
 
 
