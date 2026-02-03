@@ -6,7 +6,7 @@ const data = {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_diego.png"
       },
-        SuperDinamite: {
+        SuperDyn: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/super/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_superdinamite.png"
       },
@@ -36,11 +36,11 @@ const data = {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/the-super-kernel/inicio?authuser=0",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_kernel.png"
       },
-             CleanVibesss: {
+             CleanV: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/restaurante-y-menu/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_cleanvibes.png"
       },
-             StrangerWaffles: {
+             StWaffles: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/sahily-chable/inicio?authuser=0",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/por_stanger.png"
       },
@@ -62,7 +62,7 @@ const data = {
   Uruguay: {
     image: "https://flagcdn.com/w320/uy.png",
     teams: {
-      FoodHunters: {
+      FoodHunt: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/food-hunters/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_maren.png"
       },
@@ -146,6 +146,7 @@ const data = {
   }
 
 };
+
 
 
 
