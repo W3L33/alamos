@@ -59,6 +59,22 @@ const data = {
         TinyFresh: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/tinyfresh/home?authuser=0",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_tinyfresh.png"
+      },
+     SpiderSense: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/spiderssence/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_spidersense.png"
+      },
+   IronGlow: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/ironglow-com/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_ironglow.jpg"
+      },
+ LokiFruits: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/loki-fruits/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_lokifruits.png"
+      },
+ FrozenJuice: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/aminashamsi/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/eeuu_frozenjuice.png"
       }
     }
   },
