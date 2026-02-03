@@ -68,7 +68,7 @@ const data = {
       },
             Powerpets: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/powerpets/inicio",
-        image: ""
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/uru_powerpets.png"
       },
       BlackWidow: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/huntersproject/inicio?authuser=0",
@@ -146,6 +146,7 @@ const data = {
   }
 
 };
+
 
 
 
