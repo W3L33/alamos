@@ -149,12 +149,17 @@ const data = {
         VadersSnaks: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/vaders-snaks/vaders-snacks",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_vaderSn.png"
+      },
+                  Mysterio: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/mysteriocaps/inicio?authuser=0",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/cor_mysterio.png"
       }
       
     }
   }
 
 };
+
 
 
 
