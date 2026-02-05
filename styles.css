@@ -96,7 +96,7 @@ body.night .glass-btn {
   height: 60px;
   object-fit: cover;
   border-radius: 999px;
-  opacity: 0.55;
+  opacity: 0.20;
   flex-shrink: 0;
 }
 
@@ -160,4 +160,5 @@ body.night h1 {
   main {
     grid-template-columns: 1fr;
   }
+
 }
