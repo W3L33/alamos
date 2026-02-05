@@ -121,17 +121,6 @@ main {
 }
 
 /* ===== EREVISAR ESTO DESPUES ===== */
-.glass-btn:hover {
-  transform: translateY(-3px);
-}
-
-.icon-only {
-  padding: 0.7rem;
-}
-
-.hidden {
-  display: none;
-}
 
 /* ===== MODO NOCHE ===== */
 body.night .glass-btn {
@@ -222,5 +211,6 @@ body.night h1 {
   }
 
 }
+
 
 
