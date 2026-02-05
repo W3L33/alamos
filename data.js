@@ -3,7 +3,7 @@ const data = {
     image: "https://flagcdn.com/w320/ar.png",
     teams: {
       Kadever: {
-        link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/inicio",
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/kadever/start",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_diego.png"
       },
         SuperDyn: {
@@ -159,6 +159,7 @@ const data = {
   }
 
 };
+
 
 
 
