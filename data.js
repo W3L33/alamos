@@ -22,9 +22,13 @@ const data = {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/oats-man/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_oatsman.png"
       },
-              UltronCo: {
+        UltronCo: {
         link: "https://sites.google.com/colegioalamoscancun.edu.mx/ultroncompany/inicio",
         image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_ultron.png"
+      },
+        Thor: {
+        link: "https://sites.google.com/colegioalamoscancun.edu.mx/andreavalentinasaraiyovanymosh/inicio",
+        image: "https://raw.githubusercontent.com/W3L33/alamos/refs/heads/main/imgp/arg_thor.png"
       }
       
     }
@@ -164,6 +168,7 @@ const data = {
   }
 
 };
+
 
 
 
