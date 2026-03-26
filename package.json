@@ -13,7 +13,7 @@
     "photos:manifest": "node scripts/generate-photos-manifest.mjs && node scripts/sync-team-animals-json.mjs",
     "team:animals": "node scripts/sync-team-animals-json.mjs",
     "seed:team-photos": "node scripts/seed-team-photos.mjs",
-    "build:animales": "node scripts/build-animales.mjs",
+    "build:animales": "node -e \"const fs=require('fs'); const cp=require('child_process'); const p='scripts/build-animales.mjs'; if (fs.existsSync(p)) { const r=cp.spawnSync(process.execPath,[p],{stdio:'inherit'}); process.exit(r.status ?? 1); } console.log('[alamos] build-animales.mjs no existe, omito.');\"",
     "prebuild": "npm run sync:proyecto && node scripts/generate-photos-manifest.mjs && node scripts/sync-team-animals-json.mjs",
     "build": "npm run build:animales && vite build",
     "preview": "vite preview"
