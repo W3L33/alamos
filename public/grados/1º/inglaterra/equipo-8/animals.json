@@ -1,21 +1,5 @@
 [
   {
-    "photo": "photos/brasil-guacamayo.jpg",
-    "globeCountry": "Brasil",
-    "country": "Brasil",
-    "lat": -14.235,
-    "lon": -51.9253,
-    "animal": "Guacamayo",
-    "animalDescription": "",
-    "countryDescription": "",
-    "habitat": "",
-    "diet": "",
-    "size": "",
-    "interestingFact": "",
-    "imageUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/brasil-guacamayo.jpg",
-    "vectorFallbackUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/brasil-guacamayo.jpg"
-  },
-  {
     "photo": "photos/argentina-guanaco.jpg",
     "globeCountry": "Argentina",
     "country": "Argentina",
@@ -638,5 +622,21 @@
     "interestingFact": "",
     "imageUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/usa-oso.jpg",
     "vectorFallbackUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/usa-oso.jpg"
+  },
+  {
+    "photo": "photos/brasil-guacamayo.JPG",
+    "globeCountry": "Brasil",
+    "country": "Brasil",
+    "lat": -14.235,
+    "lon": -51.9253,
+    "animal": "Guacamayo",
+    "animalDescription": "",
+    "countryDescription": "",
+    "habitat": "",
+    "diet": "",
+    "size": "",
+    "interestingFact": "",
+    "imageUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/brasil-guacamayo.JPG",
+    "vectorFallbackUrl": "/grados/1%C2%BA/inglaterra/equipo-8/photos/brasil-guacamayo.JPG"
   }
 ]

@@ -624,7 +624,7 @@
     "vectorFallbackUrl": "/grados/1%C2%BA/mexico/equipo-2/photos/usa-oso.jpg"
   },
   {
-    "photo": "photos/mexico-ajolote.JPG",
+    "photo": "photos/mexico-ajolote.jpg",
     "globeCountry": "Mexico",
     "country": "Mexico",
     "lat": 23.6345,
@@ -636,7 +636,7 @@
     "diet": "",
     "size": "",
     "interestingFact": "",
-    "imageUrl": "/grados/1%C2%BA/mexico/equipo-2/photos/mexico-ajolote.JPG",
-    "vectorFallbackUrl": "/grados/1%C2%BA/mexico/equipo-2/photos/mexico-ajolote.JPG"
+    "imageUrl": "/grados/1%C2%BA/mexico/equipo-2/photos/mexico-ajolote.jpg",
+    "vectorFallbackUrl": "/grados/1%C2%BA/mexico/equipo-2/photos/mexico-ajolote.jpg"
   }
 ]
