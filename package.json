@@ -1,0 +1,33 @@
+{
+  "name": "hunters-den",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/ensure-animales.mjs && node scripts/apply-animales-bundle-grados-photos.mjs && node scripts/generate-photos-manifest.mjs",
+    "patch:animales-bundle": "node scripts/apply-animales-bundle-grados-photos.mjs",
+    "seed:mexico-globe-2-8": "node scripts/seed-mexico-globe-equipos-2-8.mjs",
+    "seed:fr-ale-ing-globe": "node scripts/seed-fr-ale-ing-globe-from-mexico1.mjs",
+    "dev": "vite",
+    "sync:proyecto": "node scripts/sync-proyecto-static.mjs",
+    "photos:manifest": "node scripts/generate-photos-manifest.mjs && node scripts/sync-team-animals-json.mjs",
+    "team:animals": "node scripts/sync-team-animals-json.mjs",
+    "seed:team-photos": "node scripts/seed-team-photos.mjs",
+    "build:animales": "node scripts/build-animales.mjs",
+    "prebuild": "node scripts/sync-proyecto-static.mjs && node scripts/generate-photos-manifest.mjs && node scripts/sync-team-animals-json.mjs",
+    "build": "npm run build:animales && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "9.117.3",
+    "@react-three/fiber": "8.17.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
