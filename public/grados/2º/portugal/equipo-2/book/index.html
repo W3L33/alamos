@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Visor PDF</title>
+  <script>
+    (function () {
+      const isMobile =
+        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
+        || window.innerWidth <= 768;
+
+      if (isMobile) {
+        window.location.replace('./mobile/index.html');
+      } else {
+        window.location.replace('./desktop/index.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+</body>
+</html>

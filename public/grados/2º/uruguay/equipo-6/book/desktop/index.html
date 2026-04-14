@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Libro PDF</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+(function () {
+  const esMovil =
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    navigator.maxTouchPoints > 0;
+
+  if (esMovil) {
+    // 🔒 Bloqueo inmediato
+    window.location.replace('../mobile/index.html');
+  }
+})();
+</script>
+  <style>
+    html, body { margin: 0; background: #333; color: white; overflow: hidden; }
+    #flipbook {
+      width: 100vw;
+      height: 100vh;
+    }
+    footer {
+      position: fixed !important;
+      left: 12px !important;
+      right: auto !important;
+      bottom: 12px !important;
+      width: 84px !important;
+      height: 84px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+      z-index: 900 !important;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      pointer-events: none !important;
+    }
+    .creator-float__btn {
+      pointer-events: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 84px !important;
+      height: 84px !important;
+      border-radius: 50% !important;
+      border: 2px solid #b4f7ff !important;
+      background: rgba(11, 23, 52, 0.92) !important;
+      box-shadow:
+        0 0 20px rgba(100, 227, 255, 0.42),
+        inset 0 0 16px rgba(125, 211, 252, 0.08) !important;
+      text-decoration: none !important;
+      line-height: 0 !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+    }
+    .creator-float__btn:hover,
+    .creator-float__btn:focus-visible {
+      border-color: #72f7ff !important;
+      box-shadow:
+        0 0 28px rgba(114, 247, 255, 0.55),
+        0 0 44px rgba(100, 227, 255, 0.22),
+        inset 0 0 26px rgba(125, 211, 252, 0.12) !important;
+      transform: scale(1.04) !important;
+    }
+    .creator-float__inner {
+      display: flex !important;
+      width: 67px !important;
+      height: 67px !important;
+      border-radius: 50% !important;
+      overflow: hidden !important;
+      background: #0b1734 !important;
+    }
+    .creator-float__img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: 50% 76% !important;
+      transform: translateY(10px) scale(1.48) !important;
+      display: block !important;
+    }
+  </style>
+</head>
+<body>
+
+<div id="flipbook"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+<script src="main.js"></script>
+<footer>
+  <div class="creator-float__circle-wrap">
+    <a
+      class="creator-float__btn"
+      href="https://w3l33.github.io"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Desarrollado por..."
+      aria-describedby="creator-float-tooltip"
+    >
+      <span class="creator-float__inner">
+        <img src="https://raw.githubusercontent.com/W3L33/files/refs/heads/main/IMG_0929.png" alt="" class="creator-float__img" />
+      </span>
+    </a>
+    <span id="creator-float-tooltip" class="creator-float__tooltip" role="tooltip">Desarrollado por...</span>
+  </div>
+</footer>
+
+</body>
+
+</html>

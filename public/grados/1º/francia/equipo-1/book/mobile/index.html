@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libro Digital PDF</title>
+
+<link rel="stylesheet" href="styles.css">
+<script>
+(function () {
+  const esDesktop =
+    navigator.maxTouchPoints === 0 &&
+    !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (esDesktop) {
+    // 🔒 Bloqueo inmediato
+    window.location.replace('../desktop/index.html');
+  }
+})();
+</script>
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- Tu JS principal -->
+<script src="main.js" defer></script>
+</head>
+
+<body>
+
+<div id="pdf-wrapper">
+  <div id="flip-stage">
+    <div id="next-page" class="page-layer"></div>
+    <div id="sheet-shadow"></div>
+    <div id="sheet">
+      <div class="face front"></div>
+      <div class="face back"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="creator-float__circle-wrap">
+    <a
+      class="creator-float__btn"
+      href="https://w3l33.github.io"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Desarrollado por..."
+      aria-describedby="creator-float-tooltip"
+    >
+      <span class="creator-float__inner">
+        <img src="https://raw.githubusercontent.com/W3L33/files/refs/heads/main/IMG_0929.png" alt="" class="creator-float__img" />
+      </span>
+    </a>
+    <span id="creator-float-tooltip" class="creator-float__tooltip" role="tooltip">Desarrollado por...</span>
+  </div>
+</footer>
+
+</body>
+</html>
