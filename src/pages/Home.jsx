@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { data } from "../data.js";
 import {
@@ -12,6 +12,78 @@ import CountryTeamGrid from "../components/CountryTeamGrid.jsx";
 
 // Versiona la clave para que el intro vuelva a mostrarse tras cambios de UI.
 const HOME_CONTROLS_INTRO_KEY = "alamos-home-controls-intro-v2";
+/** Conserva grado + país al recargar o con HMR de Vite (evita volver siempre a la rejilla de 2º). */
+const HOME_VIEW_STATE_KEY = "alamos-home-view-v1";
+
+function isValidCountryForGrade(grade, key) {
+  if (key == null || key === "") return true;
+  if (grade === 2) return Boolean(data[key]);
+  if (grade === 1) return GRADE1_SLUGS.includes(key);
+  if (grade === 3) return GRADE3_SLUGS.includes(key);
+  return false;
+}
+
+function readPersistedHomeView() {
+  try {
+    const raw = sessionStorage.getItem(HOME_VIEW_STATE_KEY);
+    if (!raw) return null;
+    const j = JSON.parse(raw);
+    const g = j.grade;
+    if (![1, 2, 3].includes(Number(g))) return null;
+    const grade = Number(g);
+    const countryKey =
+      j.countryKey == null || j.countryKey === "" ? null : String(j.countryKey);
+    if (countryKey && !isValidCountryForGrade(grade, countryKey)) {
+      return { grade, countryKey: null };
+    }
+    return { grade, countryKey };
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedHomeView(grade, countryKey) {
+  try {
+    sessionStorage.setItem(
+      HOME_VIEW_STATE_KEY,
+      JSON.stringify({ v: 1, grade, countryKey })
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+function clearPersistedHomeView() {
+  try {
+    sessionStorage.removeItem(HOME_VIEW_STATE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function getInitialHomeState() {
+  const introDone = readIntroDone();
+  if (!introDone) {
+    return {
+      grade: null,
+      selectedCountryKey: null,
+      showHomeControlsIntro: true,
+    };
+  }
+  const persisted = readPersistedHomeView();
+  if (persisted) {
+    return {
+      grade: persisted.grade,
+      selectedCountryKey: persisted.countryKey,
+      showHomeControlsIntro: false,
+    };
+  }
+  return {
+    grade: 2,
+    selectedCountryKey: null,
+    showHomeControlsIntro: false,
+  };
+}
 
 function preloadBackgrounds() {
   ["/alamosday.jpg", "/alamosnight.jpg"].forEach((url) => {
@@ -59,10 +131,13 @@ export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
   const { night, toggle: toggleTheme } = useTheme();
-  const [grade, setGrade] = useState(() => (readIntroDone() ? 2 : null));
-  const [selectedCountryKey, setSelectedCountryKey] = useState(null);
+  const initialHome = useMemo(() => getInitialHomeState(), []);
+  const [grade, setGrade] = useState(initialHome.grade);
+  const [selectedCountryKey, setSelectedCountryKey] = useState(
+    initialHome.selectedCountryKey
+  );
   const [showHomeControlsIntro, setShowHomeControlsIntro] = useState(
-    () => !readIntroDone()
+    initialHome.showHomeControlsIntro
   );
   const [isLeavingToInitialScreen, setIsLeavingToInitialScreen] = useState(false);
   const touchStartX = useRef(0);
@@ -72,6 +147,11 @@ export default function Home() {
   useEffect(() => {
     preloadBackgrounds();
   }, []);
+
+  useEffect(() => {
+    if (!readIntroDone()) return;
+    writePersistedHomeView(grade, selectedCountryKey);
+  }, [grade, selectedCountryKey]);
 
   useEffect(() => {
     return () => {
@@ -86,8 +166,11 @@ export default function Home() {
     if (st?.restoreCountry != null) {
       setIntroDone();
       setShowHomeControlsIntro(false);
-      setGrade(st.restoreGrade ?? 2);
-      setSelectedCountryKey(st.restoreCountry);
+      const g = st.restoreGrade ?? 2;
+      const ck = st.restoreCountry;
+      setGrade(g);
+      setSelectedCountryKey(ck);
+      writePersistedHomeView(g, ck);
       navigate("/", { replace: true, state: {} });
     }
   }, [location.state, navigate]);
@@ -104,6 +187,7 @@ export default function Home() {
     setIsLeavingToInitialScreen(true);
     leaveToInitialTimerRef.current = setTimeout(() => {
       clearIntroDone();
+      clearPersistedHomeView();
       setSelectedCountryKey(null);
       setGrade(null);
       setShowHomeControlsIntro(true);

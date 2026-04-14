@@ -6,8 +6,10 @@ import { data } from "../data.js";
 import { countryKeyToSlug } from "../utils/teamPaths.js";
 import { getPhotosManifest, randomPhotoUrlFromManifest } from "../utils/teamPhotos.js";
 import { DEFAULT_TEAM_IMAGE } from "../teamPlaceholders.js";
+import { sitePath } from "../utils/teamGlobeFromManifest.js";
 
 const EMBED_RETURN_KEY = "alamos-embed-return";
+const HOME_CONTROLS_INTRO_KEY = "alamos-home-controls-intro-v2";
 
 function globeIframeSrc(countrySlug, teamId) {
   const carpeta = getTeamAnimalsFolderIdFromRoute(countrySlug, teamId);
@@ -25,6 +27,42 @@ function globeIframeSrc(countrySlug, teamId) {
   }
 
   return `${base}animales/index.html?${qs}`;
+}
+
+function grade2BookSrc(countrySlug, teamId) {
+  const encodedPath = [
+    "grados",
+    encodeURIComponent("2º"),
+    encodeURIComponent(String(countrySlug || "").toLowerCase()),
+    encodeURIComponent(`equipo-${String(teamId || "")}`),
+    "book",
+    "index.html",
+  ].join("/");
+  return sitePath(`/${encodedPath}`);
+}
+
+function grade1BookSrc(countrySlug, teamId) {
+  const encodedPath = [
+    "grados",
+    encodeURIComponent("1º"),
+    encodeURIComponent(String(countrySlug || "").toLowerCase()),
+    encodeURIComponent(`equipo-${String(teamId || "")}`),
+    "book",
+    "index.html",
+  ].join("/");
+  return sitePath(`/${encodedPath}`);
+}
+
+function grade3BookSrc(countrySlug, teamId) {
+  const encodedPath = [
+    "grados",
+    encodeURIComponent("3º"),
+    encodeURIComponent(String(countrySlug || "").toLowerCase()),
+    encodeURIComponent(`equipo-${String(teamId || "")}`),
+    "book",
+    "index.html",
+  ].join("/");
+  return sitePath(`/${encodedPath}`);
 }
 
 export default function TeamAnimalPage() {
@@ -59,6 +97,13 @@ export default function TeamAnimalPage() {
     countrySlug || "",
     teamId || ""
   );
+  const isGrade1Book = useMemo(() => {
+    const params = new URLSearchParams(location.search || "");
+    return params.get("view") === "book";
+  }, [location.search]);
+  const isGrade2Book = grade === 2;
+  const isGrade3Book = grade === 3;
+  const isGradeBookEmbed = isGrade2Book || isGrade3Book;
 
   const [heroUrl, setHeroUrl] = useState(null);
 
@@ -76,7 +121,7 @@ export default function TeamAnimalPage() {
   }, [grade, carpeta]);
 
   useEffect(() => {
-    if (grade !== 1) return;
+    if (grade !== 1 && !isGradeBookEmbed) return;
     function onMessage(event) {
       if (event.origin !== window.location.origin) return;
       const t = event.data?.type;
@@ -97,17 +142,30 @@ export default function TeamAnimalPage() {
       }
       if (t === "alamos-embed-home") {
         sessionStorage.removeItem(EMBED_RETURN_KEY);
+        sessionStorage.removeItem(HOME_CONTROLS_INTRO_KEY);
         navigate("/", { replace: true });
       }
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [grade, navigate]);
+  }, [grade, isGradeBookEmbed, navigate]);
 
   const src = useMemo(
     () => globeIframeSrc(countrySlug || "", teamId || ""),
     [countrySlug, teamId]
   );
+  const bookSrc = useMemo(() => {
+    if (grade === 1 && isGrade1Book) {
+      return grade1BookSrc(countrySlug || "", teamId || "");
+    }
+    if (isGrade2Book) {
+      return grade2BookSrc(countrySlug || "", teamId || "");
+    }
+    if (isGrade3Book) {
+      return grade3BookSrc(countrySlug || "", teamId || "");
+    }
+    return "";
+  }, [grade, isGrade1Book, isGrade2Book, isGrade3Book, countrySlug, teamId]);
 
   const handleBack = () => {
     const st = location.state;
@@ -123,13 +181,26 @@ export default function TeamAnimalPage() {
     navigate(-1);
   };
 
-  if (grade === 1) {
+  if (grade === 1 && !isGrade1Book) {
     return (
       <div className="team-animal-page team-animal-page--iframe-only">
         <iframe
           title="Animales del mundo — proyecto"
           className="team-globe-frame team-globe-frame--fullscreen"
           src={src}
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
+  if (isGradeBookEmbed || (grade === 1 && isGrade1Book)) {
+    return (
+      <div className="team-animal-page team-animal-page--iframe-only">
+        <iframe
+          title={`Proyecto Book — ${countrySlug} Equipo ${teamId}`}
+          className="team-globe-frame team-globe-frame--fullscreen"
+          src={bookSrc}
           allowFullScreen
         />
       </div>

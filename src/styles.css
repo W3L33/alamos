@@ -746,6 +746,56 @@ body.night .team-card.glass-team::before {
   opacity: 1;
 }
 
+.team-card__action-btn {
+  position: absolute;
+  left: 0.55rem;
+  bottom: 0.55rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.1rem;
+  padding: 0.32rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid rgba(186, 230, 253, 0.9);
+  background: rgba(11, 23, 52, 0.82);
+  color: #e2f2ff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  box-shadow: 0 5px 14px rgba(2, 6, 23, 0.35);
+  pointer-events: auto;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.team-card__action-btn--right {
+  left: auto;
+  right: 0.55rem;
+}
+
+.team-card__action-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(125, 211, 252, 1);
+  background: rgba(15, 35, 74, 0.92);
+  box-shadow:
+    0 8px 18px rgba(2, 6, 23, 0.45),
+    0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+.team-card__action-btn:focus-visible {
+  outline: none;
+  border-color: rgba(125, 211, 252, 1);
+  background: rgba(15, 35, 74, 0.92);
+  box-shadow:
+    0 8px 18px rgba(2, 6, 23, 0.45),
+    0 0 0 2px rgba(56, 189, 248, 0.45),
+    0 0 14px rgba(56, 189, 248, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .team-card__img--overlay {
     transition: none;
@@ -809,6 +859,10 @@ body.night .team-card__integrantes {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+}
+
+.team-card--static {
+  cursor: default;
 }
 
 /* Hover: contorno iluminado en verde */

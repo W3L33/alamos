@@ -27,6 +27,8 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
   const { night } = useTheme();
   const folderId = getTeamAnimalsFolderId(countryKey, grade, card.id);
   const slug = countryKeyToSlug(countryKey, grade);
+  const isGrade1 = grade === 1 || Number(grade) === 1;
+  const isGrade2 = grade === 2 || Number(grade) === 2;
   const isGrade3 = grade === 3 || Number(grade) === 3;
 
   /** Solo 3º: manifiesto suele no tener claves 3º hasta correr photos:manifest; si falla, animals.json. */
@@ -78,6 +80,7 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
   const showOverlay = hasRealPhoto && !overlayBroken;
   const [photoLoaded, setPhotoLoaded] = useState(false);
   const overlayRef = useRef(null);
+  const actionLabel = isGrade1 ? "Mapa" : (isGrade2 || isGrade3) ? "Revista" : null;
 
   useEffect(() => {
     setPhotoLoaded(false);
@@ -91,12 +94,8 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
     return () => cancelAnimationFrame(id);
   }, [rawUrl, showOverlay]);
 
-  return (
-    <Link
-      to={`/equipo/${slug}/${card.id}`}
-      state={{ fromCountry: countryKey, fromGrade: grade }}
-      className="team-card glass-team team-card--link"
-    >
+  const cardContent = (
+    <>
       <div className="team-card__media">
         <img
           className="team-card__img team-card__img--base"
@@ -122,6 +121,26 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
             draggable={false}
           />
         ) : null}
+        {actionLabel ? (
+          <Link
+            to={`/equipo/${slug}/${card.id}`}
+            state={{ fromCountry: countryKey, fromGrade: grade }}
+            className="team-card__action-btn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {actionLabel}
+          </Link>
+        ) : null}
+        {isGrade1 ? (
+          <Link
+            to={`/equipo/${slug}/${card.id}?view=book`}
+            state={{ fromCountry: countryKey, fromGrade: grade }}
+            className="team-card__action-btn team-card__action-btn--right"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Revista
+          </Link>
+        ) : null}
       </div>
       <div className="team-card__body">
         <h2 className="team-card__title">{card.name}</h2>
@@ -130,8 +149,10 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
           {card.integrantesLabel}
         </p>
       </div>
-    </Link>
+    </>
   );
+
+  return <article className="team-card glass-team team-card--link team-card--static">{cardContent}</article>;
 }
 
 export default function CountryTeamGrid({ countryKey, grade }) {
@@ -142,7 +163,8 @@ export default function CountryTeamGrid({ countryKey, grade }) {
   useEffect(() => {
     let active = true;
     async function loadManifest() {
-      if (isGrade3) {
+      const grade2 = grade === 2 || Number(grade) === 2;
+      if (isGrade3 || grade2) {
         clearPhotosManifestCache();
         try {
           const r = await fetch(
@@ -163,7 +185,7 @@ export default function CountryTeamGrid({ countryKey, grade }) {
     return () => {
       active = false;
     };
-  }, [isGrade3, countryKey]);
+  }, [isGrade3, grade, countryKey]);
 
   useEffect(() => {
     let active = true;

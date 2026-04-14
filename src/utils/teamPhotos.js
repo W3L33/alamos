@@ -62,13 +62,25 @@ function teamBaseFromManifestCompositeKey(key) {
 let manifestPromise = null;
 
 export function getPhotosManifest() {
+  // En desarrollo, no reutilizar la primera petición: el manifiesto cambia al añadir fotos.
+  if (import.meta.env.DEV) {
+    return fetch(`/grados/photos-manifest.json?t=${Date.now()}`, {
+      cache: "no-store",
+    })
+      .then(async (r) => {
+        if (!r.ok) return {};
+        try {
+          return await r.json();
+        } catch {
+          return {};
+        }
+      })
+      .catch(() => ({}));
+  }
+
   if (!manifestPromise) {
-    const url =
-      import.meta.env.DEV
-        ? `/grados/photos-manifest.json?t=${Date.now()}`
-        : "/grados/photos-manifest.json";
-    manifestPromise = fetch(url, {
-      cache: import.meta.env.DEV ? "no-store" : "default",
+    manifestPromise = fetch("/grados/photos-manifest.json", {
+      cache: "default",
     })
       .then(async (r) => {
         if (!r.ok) {

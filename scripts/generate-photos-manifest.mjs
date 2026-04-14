@@ -53,8 +53,14 @@ function readAnimalsJsonPhotoPaths(teamDir) {
 function collectImageRelPaths(teamDir) {
   const fromDisk = collectAllImageRelPaths(teamDir);
   const fromAnimalsJson = readAnimalsJsonPhotoPaths(teamDir);
-  if (fromAnimalsJson !== null && fromAnimalsJson.length > 0) {
-    const set = new Set([...fromDisk, ...fromAnimalsJson]);
+  if (fromAnimalsJson != null && fromAnimalsJson.length > 0) {
+    // Todo lo que está en photos/ sale del escaneo en disco (cualquier nombre .jpg/.png/…).
+    // No mezclar rutas "photos/..." del JSON que apunten a archivos ya borrados.
+    const jsonExtra = fromAnimalsJson.filter((p) => {
+      const norm = String(p).replace(/\\/g, "/").trim();
+      return norm && !norm.toLowerCase().startsWith("photos/");
+    });
+    const set = new Set([...fromDisk, ...jsonExtra]);
     return [...set].sort();
   }
   return fromDisk;
