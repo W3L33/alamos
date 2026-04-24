@@ -22,6 +22,7 @@ let dragDireccion = null;
 let dragDestino = null;
 let dragProgress = 0;
 let startX = 0;
+let touchStartY = 0;
 let dragLastX = 0;
 let dragLastT = 0;
 let dragVelocityX = 0;
@@ -561,6 +562,7 @@ stage.addEventListener('touchstart', (e) => {
     zoomBase = zoomScale;
     return;
   }
+  touchStartY = e.touches[0].clientY;
   iniciarDrag(e.touches[0].clientX);
 });
 
@@ -581,8 +583,18 @@ stage.addEventListener('touchmove', (e) => {
     setZoom(nextZoom, cx, cy);
     return;
   }
+  const moveX = e.touches[0].clientX;
+  const moveY = e.touches[0].clientY;
+  const deltaX = Math.abs(moveX - startX);
+  const deltaY = Math.abs(moveY - touchStartY);
+
+  if (deltaY > deltaX + 6) {
+    dragActivo = false;
+    return;
+  }
+
   e.preventDefault();
-  moverDrag(e.touches[0].clientX).catch(console.error);
+  moverDrag(moveX).catch(console.error);
 }, { passive: false });
 
 stage.addEventListener('touchend', (e) => {
