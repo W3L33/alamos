@@ -267,10 +267,16 @@ export default function Home() {
   }, [isLeavingToInitialScreen]);
 
   const handleSwipe = useCallback(() => {
-    if (selectedCountryKey) return;
     const deltaX = touchEndX.current - touchStartX.current;
     const deltaY = touchEndY.current - touchStartY.current;
     const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+
+    if (selectedCountryKey) {
+      if (isHorizontal && deltaX > 80) {
+        setSelectedCountryKey(null);
+      }
+      return;
+    }
 
     if (!selectedCountryKey && grade != null && isHorizontal && Math.abs(deltaX) > 50) {
       const next = deltaX < 0 ? grade + 1 : grade - 1;
