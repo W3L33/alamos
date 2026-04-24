@@ -89,6 +89,72 @@ function crearBoton(iconoSvg, label) {
   return btn;
 }
 
+
+const loaderStyleTag = document.createElement("style");
+loaderStyleTag.textContent = `
+.loader-wrap {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 12000;
+  background: rgba(0, 0, 0, 0.36);
+  pointer-events: none;
+}
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px dotted #72f7ff;
+  border-style: solid solid dotted dotted;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px dotted #FF3D00;
+  border-style: solid solid dotted;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  animation: rotationBack 1s linear infinite;
+  transform-origin: center center;
+}
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes rotationBack {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+`;
+document.head.appendChild(loaderStyleTag);
+
+const loaderWrap = document.createElement("div");
+loaderWrap.className = "loader-wrap";
+const loaderEl = document.createElement("span");
+loaderEl.className = "loader";
+loaderWrap.appendChild(loaderEl);
+document.body.appendChild(loaderWrap);
+
+function showLoader() {
+  loaderWrap.style.display = "grid";
+}
+
+function hideLoader() {
+  loaderWrap.style.display = "none";
+}
+
 const iconBack10 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 7l-5 5 5 5"/><path d="M18 7l-5 5 5 5"/></svg>';
 const iconBack1 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 7l-5 5 5 5"/></svg>';
 const iconNext1 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l5 5-5 5"/></svg>';
@@ -157,6 +223,7 @@ const btnHome = crearBotonAccion(iconHome, "Home");
 btnHome.onclick = () => postEmbedAction("alamos-embed-home");
 acciones.append(btnBack, btnHome);
 document.body.appendChild(acciones);
+acciones.style.display = "none";
 
 // Indicador de página
 const indicadorPagina = document.createElement('span');
@@ -179,6 +246,7 @@ indicadorPagina.style.whiteSpace = 'nowrap';
 
 controles.append(btnMenos10, btnMenos1, indicadorPagina, btnMas1, btnMas10);
 document.body.appendChild(controles);
+controles.style.display = "none";
 
 container.style.willChange = "transform";
 container.style.transition = "none";
@@ -376,9 +444,19 @@ function iniciarFlipbook() {
 
   // Inicializar indicador
   indicadorPagina.textContent = `1 / ${images.length}`;
+
+  requestAnimationFrame(() => {
+    hideLoader();
+    controles.style.display = 'flex';
+    acciones.style.display = 'flex';
+  });
 }
 
 // -------------------- Ejecutar --------------------
-cargarPDF();
+showLoader();
+cargarPDF().catch((error) => {
+  console.error(error);
+  showLoader();
+});
 
 

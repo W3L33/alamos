@@ -1,7 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500;600;700;800&display=swap");
+
 /* ===== BASE ===== */
 /* Tipografía + tema base del proyecto */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Dosis", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   color: #e8f1ff;
   background-color: #030712;
   text-rendering: optimizeLegibility;
@@ -23,6 +25,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100svh;
   font-family: inherit;
   transition: background 0.45s ease;
   background: radial-gradient(
@@ -130,13 +133,58 @@ body {
   padding-left: 1rem;
 }
 
+.page-home--country {
+  position: relative;
+}
+
+.page-home--country::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  backdrop-filter: blur(8px) saturate(110%);
+  -webkit-backdrop-filter: blur(8px) saturate(110%);
+}
+
+.page-home--country > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* ===== FONDOS ===== */
 body.day {
-  background: url("/alamosday.jpg") center / cover fixed no-repeat;
+  background-image: url("/alamosday.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
 body.night {
-  background: url("/alamosnight.jpg") center / cover fixed no-repeat;
+  background-image: url("/alamosnight.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+@media (max-width: 768px) {
+  body,
+  #root,
+  .app-root,
+  .route-fade {
+    min-height: 100svh;
+  }
+}
+
+body.iframe-open {
+  background: #000 !important;
+}
+
+html:has(body.iframe-open),
+body.iframe-open {
+  overflow: hidden;
 }
 
 /* Tema en vistas que no son Home (p. ej. equipo / globo): esquina inferior derecha */
@@ -283,6 +331,43 @@ body.night .glass-bar {
   flex: 0 0 auto;
 }
 
+.page-home--country .home-bottom-bar .grade-float__btn {
+  display: none;
+}
+
+.page-home--country .home-bottom-bar .home-theme-btn {
+  display: none;
+}
+
+.page-home--country .home-bottom-bar .grade-float {
+  width: 0;
+  min-width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  display: none;
+  pointer-events: none;
+}
+
+.page-home--country .top-bar__left .glass-btn.glass-btn--icon {
+  position: static;
+}
+
+.page-home--country .home-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.95rem;
+}
+
+.country-back-fab {
+  position: static;
+  transform: none;
+  z-index: 230;
+}
+
 .top-bar__balance {
   flex: 0 0 2.75rem;
   width: 2.75rem;
@@ -320,6 +405,32 @@ body.night .glass-bar {
   line-height: 1.22;
   /* El movimiento lo lleva el header .top-bar.glass-bar (evita slideFadeIn global) */
   animation: none;
+}
+
+.top-bar__title-with-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.top-bar__title-with-flag > span {
+  font-size: 0.82em;
+}
+
+.top-bar__title-flag {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.78;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+body.day .top-bar__title-flag {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -423,9 +534,44 @@ body.night .home-country-top-float {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.22;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
+}
+
+.home-country-top-float__title-animate {
+  display: inline-block;
+}
+
+.home-country-top-float__title-enter {
+  animation: homeTopTitleDropIn 0.2s ease-out both;
+}
+
+.home-country-top-float__title-leave {
+  animation: homeTopTitleLiftOut 0.3s ease-out both;
+  will-change: transform, opacity;
+}
+
+@keyframes homeTopTitleDropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-130px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes homeTopTitleLiftOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-130px);
+  }
 }
 
 body.day .home-country-top-float__title {
@@ -467,9 +613,14 @@ body.night .home-country-top-float__title {
 /* Salida al volver a pantalla inicial: evitar pisar transforms existentes */
 .page-home--leaving-to-initial .top-bar,
 .page-home--leaving-to-initial .country-flag-float,
-.page-home--leaving-to-initial .home-country-top-float,
-.page-home--leaving-to-initial .home-bottom-bar {
+.page-home--leaving-to-initial .home-country-top-float {
   animation: homeLeaveFade 0.28s ease both;
+  pointer-events: none;
+}
+
+.page-home--leaving-to-initial .home-bottom-bar {
+  animation: none;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -845,13 +996,14 @@ body.night .team-card__integrantes {
 
 @media (max-width: 480px) {
   .team-grid {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    justify-items: stretch;
   }
 
   .team-card.glass-team {
-    width: 70%;
-    max-width: 100%;
+    width: 100%;
+    max-width: none;
   }
 }
 
@@ -1417,6 +1569,8 @@ body.night .team-card.team-card--link:hover {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   cursor: pointer;
   border: none;
   font: inherit;
@@ -1634,6 +1788,16 @@ body.night
   justify-self: center;
 }
 
+@media (min-width: 768px) and (max-width: 1024px) {
+  .page-home--no-toolbar .content-grid:not(.content-grid--teams) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page-home--no-toolbar .content-grid:not(.content-grid--teams) > .glass-tile.glass-tile--action {
+    width: 100%;
+  }
+}
+
 .content-grid:not(.content-grid--teams)
   > .glass-tile.glass-tile--action
   .glass-tile__thumb,
@@ -1702,6 +1866,11 @@ body.night .glass-tile__text {
 
 .glass-tile__flag {
   object-fit: cover;
+  opacity: 0.78;
+}
+
+body.day .glass-tile__flag {
+  opacity: 1;
 }
 
 .glass-tile__placeholder {
@@ -1747,6 +1916,8 @@ body.night .grade-float {
   min-width: 3.1rem;
   height: 2.85rem;
   padding: 0 1rem;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -1830,8 +2001,13 @@ body.night .glass-pill.is-active {
   height: 42px;
   border-radius: 50%;
   object-fit: cover;
+  opacity: 0.78;
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+body.day .country-header__flag {
+  opacity: 1;
 }
 
 .country-body {
@@ -1895,8 +2071,151 @@ body.night .country-card__lead {
 
 /* ===== LAYOUT RESPONSIVE ===== */
 @media (max-width: 480px) {
+  .page-home {
+    overflow: hidden;
+    touch-action: pan-x;
+  }
+
+  .page-home--country {
+    overflow-y: auto;
+    touch-action: auto;
+  }
+
+  .page-home--country main {
+    overflow-y: auto;
+    touch-action: auto;
+  }
+
+  .page-home--no-toolbar main {
+    overflow: hidden;
+    touch-action: pan-x;
+  }
+
+  .home-bottom-bar {
+    transition: none;
+  }
+
+  .home-bottom-bar--intro {
+    transform: translateX(-50%);
+  }
+
+  .home-bottom-bar .grade-float {
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-bottom-bar--intro .grade-float {
+    transform: translateY(
+        calc(-50vh + max(1.25rem, env(safe-area-inset-bottom)) + 50%)
+      )
+      scale(2);
+  }
+
+  .home-bottom-bar .home-theme-btn {
+    transition: none;
+    transform: none !important;
+  }
+
+  .page-home--no-toolbar .home-bottom-bar .home-theme-btn {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 0.86rem;
+  }
+
+  .page-home--no-toolbar .home-bottom-bar .grade-float {
+    padding: 0.32rem 0.38rem;
+    gap: 0.35rem;
+  }
+
+  .page-home--no-toolbar .home-bottom-bar .glass-pill {
+    min-width: 2.45rem;
+    height: 2.35rem;
+    padding: 0 0.58rem;
+  }
+
+  .page-home--no-toolbar .home-bottom-bar .grade-float__label {
+    font-size: 0.82rem;
+  }
+
   .content-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .content-grid:not(.content-grid--teams) > .glass-tile.glass-tile--action {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    min-height: 96px;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.68);
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action
+    .glass-tile__thumb,
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action
+    .glass-tile__flag {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 0;
+    box-shadow: none;
+    transition: filter 0.22s ease;
+  }
+
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action
+    .glass-tile__text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.26);
+    color: #f8fafc;
+    font-size: clamp(0.9rem, 4vw, 1.18rem);
+    font-weight: 700;
+    line-height: 1.02;
+    text-align: center;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:hover
+    .glass-tile__thumb,
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:hover
+    .glass-tile__flag,
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:focus-visible
+    .glass-tile__thumb,
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:focus-visible
+    .glass-tile__flag {
+    filter: brightness(0.78);
+  }
+
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:hover
+    .glass-tile__text,
+  .content-grid:not(.content-grid--teams)
+    > .glass-tile.glass-tile--action:focus-visible
+    .glass-tile__text {
+    opacity: 1;
   }
 
   .glass-tile__thumb,

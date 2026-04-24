@@ -85,22 +85,7 @@ function getSliceBackgroundPos(i) {
   return `${(i / (SLICE_COUNT - 1)) * 100}% 0%`;
 }
 
-const estado = document.createElement('div');
-estado.style.position = 'fixed';
-estado.style.top = '10px';
-estado.style.left = '50%';
-estado.style.transform = 'translateX(-50%)';
-estado.style.padding = '8px 12px';
-estado.style.fontSize = '12px';
-estado.style.color = '#fff';
-estado.style.background = 'rgba(0,0,0,0.55)';
-estado.style.border = '1px solid rgba(255,255,255,0.25)';
-estado.style.borderRadius = '8px';
-estado.style.zIndex = 10001;
-estado.style.maxWidth = '92vw';
-estado.style.textAlign = 'center';
-estado.textContent = 'Cargando PDF...';
-document.body.appendChild(estado);
+
 
 const controles = document.createElement('div');
 controles.style.position = 'fixed';
@@ -135,6 +120,72 @@ function crearBoton(iconoSvg, label) {
   btn.onmouseenter = () => { btn.style.opacity = '0.85'; };
   btn.onmouseleave = () => { btn.style.opacity = '0.45'; };
   return btn;
+}
+
+
+const loaderStyleTag = document.createElement("style");
+loaderStyleTag.textContent = `
+.loader-wrap {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 12000;
+  background: rgba(0, 0, 0, 0.36);
+  pointer-events: none;
+}
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px dotted #72f7ff;
+  border-style: solid solid dotted dotted;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+.loader::after {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px dotted #FF3D00;
+  border-style: solid solid dotted;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  animation: rotationBack 1s linear infinite;
+  transform-origin: center center;
+}
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes rotationBack {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+`;
+document.head.appendChild(loaderStyleTag);
+
+const loaderWrap = document.createElement("div");
+loaderWrap.className = "loader-wrap";
+const loaderEl = document.createElement("span");
+loaderEl.className = "loader";
+loaderWrap.appendChild(loaderEl);
+document.body.appendChild(loaderWrap);
+
+function showLoader() {
+  loaderWrap.style.display = "grid";
+}
+
+function hideLoader() {
+  loaderWrap.style.display = "none";
 }
 
 const iconBack10 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 7l-5 5 5 5"/><path d="M18 7l-5 5 5 5"/></svg>';
@@ -204,6 +255,7 @@ const btnHome = crearBotonAccion(iconHome, "Home");
 btnHome.onclick = () => postEmbedAction("alamos-embed-home");
 acciones.append(btnBack, btnHome);
 document.body.appendChild(acciones);
+acciones.style.display = "none";
 
 const indicadorPagina = document.createElement('span');
 indicadorPagina.style.padding = '4px 5px';
@@ -221,6 +273,7 @@ indicadorPagina.style.whiteSpace = 'nowrap';
 
 controles.append(btnMenos10, btnMenos1, indicadorPagina, btnMas1, btnMas10);
 document.body.appendChild(controles);
+controles.style.display = "none";
 
 function actualizarIndicador() {
   indicadorPagina.textContent = `${paginaActual} / ${totalPaginas}`;
@@ -593,11 +646,12 @@ async function iniciar() {
     backSlices.push(bs);
   }
 
-  estado.textContent = 'Abriendo PDF...';
+  showLoader();
   await cargarPDF();
-  estado.textContent = 'Renderizando primera pagina...';
   await renderEstadoBase();
-  estado.style.display = 'none';
+  hideLoader();
+  controles.style.display = 'flex';
+  acciones.style.display = 'flex';
   setTimeout(() => {
     renderPaginaAImagen(Math.min(totalPaginas, paginaActual + 1)).catch(() => {});
     renderPaginaAImagen(Math.max(1, paginaActual - 1)).catch(() => {});
@@ -606,7 +660,9 @@ async function iniciar() {
 
 iniciar().catch((error) => {
   indicadorPagina.textContent = 'Error';
+  controles.style.display = "none";
+  acciones.style.display = "none";
   const detalle = error && error.message ? error.message : String(error);
-  estado.textContent = `Error al cargar PDF: ${detalle}`;
+  showLoader();
   console.error(error);
 });

@@ -104,6 +104,10 @@ export default function TeamAnimalPage() {
   const isGrade2Book = grade === 2;
   const isGrade3Book = grade === 3;
   const isGradeBookEmbed = isGrade2Book || isGrade3Book;
+  const isIframeView =
+    (grade === 1 && !isGrade1Book) ||
+    isGradeBookEmbed ||
+    (grade === 1 && isGrade1Book);
 
   const [heroUrl, setHeroUrl] = useState(null);
 
@@ -149,6 +153,13 @@ export default function TeamAnimalPage() {
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, [grade, isGradeBookEmbed, navigate]);
+
+  useEffect(() => {
+    document.body.classList.toggle("iframe-open", isIframeView);
+    return () => {
+      document.body.classList.remove("iframe-open");
+    };
+  }, [isIframeView]);
 
   const src = useMemo(
     () => globeIframeSrc(countrySlug || "", teamId || ""),

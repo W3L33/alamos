@@ -127,6 +127,13 @@ function resolveCountryView(grade, key) {
   return null;
 }
 
+function resolveGradeLabel(grade) {
+  if (grade === 1) return "Primero";
+  if (grade === 2) return "Segundo";
+  if (grade === 3) return "Tercero";
+  return "Grupos";
+}
+
 export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -140,9 +147,15 @@ export default function Home() {
     initialHome.showHomeControlsIntro
   );
   const [isLeavingToInitialScreen, setIsLeavingToInitialScreen] = useState(false);
+  const [topTitle, setTopTitle] = useState(resolveGradeLabel(initialHome.grade));
+  const [pendingTopTitle, setPendingTopTitle] = useState(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndY = useRef(0);
   const leaveToInitialTimerRef = useRef(null);
+  const topTitleRef = useRef(null);
+  const topTitleAnimatingRef = useRef(false);
 
   useEffect(() => {
     preloadBackgrounds();
@@ -160,6 +173,64 @@ export default function Home() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const nextTitle = resolveGradeLabel(grade);
+    if (nextTitle === topTitle || nextTitle === pendingTopTitle) return;
+    setPendingTopTitle(nextTitle);
+  }, [grade, topTitle, pendingTopTitle]);
+
+  useEffect(() => {
+    if (!pendingTopTitle || topTitleAnimatingRef.current) return;
+    const el = topTitleRef.current;
+    if (!el || typeof el.animate !== "function") {
+      setTopTitle(pendingTopTitle);
+      setPendingTopTitle(null);
+      return;
+    }
+
+    const nextTitle = pendingTopTitle;
+    let cancelled = false;
+    topTitleAnimatingRef.current = true;
+
+    (async () => {
+      try {
+        const leave = el.animate(
+          [
+            { transform: "translateY(0)", opacity: 1 },
+            { transform: "translateY(-130px)", opacity: 1 },
+          ],
+          { duration: 300, easing: "ease-out", fill: "forwards" }
+        );
+        await leave.finished;
+        if (cancelled) return;
+
+        setTopTitle(nextTitle);
+        el.style.transform = "translateY(-130px)";
+
+        const enter = el.animate(
+          [
+            { transform: "translateY(-130px)", opacity: 1 },
+            { transform: "translateY(0)", opacity: 1 },
+          ],
+          { duration: 200, easing: "ease-out", fill: "forwards" }
+        );
+        await enter.finished;
+      } catch {
+        // ignore animation cancellation
+      } finally {
+        el.style.transform = "";
+        if (!cancelled) setPendingTopTitle(null);
+        topTitleAnimatingRef.current = false;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      el.getAnimations?.().forEach((a) => a.cancel());
+      topTitleAnimatingRef.current = false;
+    };
+  }, [pendingTopTitle]);
 
   useEffect(() => {
     const st = location.state;
@@ -196,18 +267,26 @@ export default function Home() {
   }, [isLeavingToInitialScreen]);
 
   const handleSwipe = useCallback(() => {
+    if (selectedCountryKey) return;
     const deltaX = touchEndX.current - touchStartX.current;
-    if (deltaX > 80 && selectedCountryKey) {
-      setSelectedCountryKey(null);
+    const deltaY = touchEndY.current - touchStartY.current;
+    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+
+    if (!selectedCountryKey && grade != null && isHorizontal && Math.abs(deltaX) > 50) {
+      const next = deltaX < 0 ? grade + 1 : grade - 1;
+      const wrapped = next > 3 ? 1 : next < 1 ? 3 : next;
+      handleGradeChange(wrapped);
     }
-  }, [selectedCountryKey]);
+  }, [selectedCountryKey, grade, handleGradeChange]);
 
   const onTouchStart = (e) => {
     touchStartX.current = e.changedTouches[0].screenX;
+    touchStartY.current = e.changedTouches[0].screenY;
   };
 
   const onTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
+    touchEndY.current = e.changedTouches[0].screenY;
     handleSwipe();
   };
 
@@ -238,37 +317,30 @@ export default function Home() {
         <>
           <header className="top-bar glass-bar">
             <div className="top-bar__left">
-              <button
-                type="button"
-                className="glass-btn glass-btn--icon"
-                onClick={() => setSelectedCountryKey(null)}
-                aria-label="Volver a países"
-              >
-                <i className="fa-solid fa-arrow-left" />
-              </button>
+              <div className="top-bar__spacer" aria-hidden />
             </div>
             <h1 className="top-bar__title">
-              <span className="title-animate">{view.title}</span>
+              <span className="title-animate top-bar__title-with-flag">
+                <img
+                  src={view.flag}
+                  alt=""
+                  className="top-bar__title-flag"
+                />
+                <span>{view.title}</span>
+              </span>
             </h1>
             <div className="top-bar__balance" aria-hidden />
           </header>
-          <div
-            className="country-flag-float"
-            aria-hidden
-            key={selectedCountryKey}
-          >
-            <img
-              src={view.flag}
-              alt=""
-              className="country-flag-float__img"
-            />
-          </div>
         </>
       ) : null}
 
       {!insideCountry ? (
         <div className="home-country-top-float">
-          <h1 className="home-country-top-float__title">Grupos</h1>
+          <h1 className="home-country-top-float__title">
+            <span ref={topTitleRef} className="home-country-top-float__title-animate">
+              {topTitle}
+            </span>
+          </h1>
         </div>
       ) : null}
 
@@ -310,6 +382,16 @@ export default function Home() {
         >
           <i className={`fa-solid ${night ? "fa-sun" : "fa-moon"}`} />
         </button>
+        {insideCountry ? (
+          <button
+            type="button"
+            className="glass-btn glass-btn--icon country-back-fab"
+            onClick={() => setSelectedCountryKey(null)}
+            aria-label="Volver a países"
+          >
+            <i className="fa-solid fa-arrow-left" />
+          </button>
+        ) : null}
         <GradeFloat grade={grade} onChange={handleGradeChange} />
         <button
           type="button"
