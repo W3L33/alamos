@@ -197,8 +197,8 @@ export default function Home() {
       try {
         const leave = el.animate(
           [
-            { transform: "translateY(0)", opacity: 1 },
-            { transform: "translateY(-130px)", opacity: 1 },
+            { transform: "translate(-50%, 0)", opacity: 1 },
+            { transform: "translate(-50%, -130px)", opacity: 1 },
           ],
           { duration: 300, easing: "ease-out", fill: "forwards" }
         );
@@ -206,12 +206,12 @@ export default function Home() {
         if (cancelled) return;
 
         setTopTitle(nextTitle);
-        el.style.transform = "translateY(-130px)";
+        el.style.transform = "translate(-50%, -130px)";
 
         const enter = el.animate(
           [
-            { transform: "translateY(-130px)", opacity: 1 },
-            { transform: "translateY(0)", opacity: 1 },
+            { transform: "translate(-50%, -130px)", opacity: 1 },
+            { transform: "translate(-50%, 0)", opacity: 1 },
           ],
           { duration: 200, easing: "ease-out", fill: "forwards" }
         );
@@ -371,9 +371,9 @@ export default function Home() {
       ) : null}
 
       {!insideCountry ? (
-        <div className="home-country-top-float">
+        <div ref={topTitleRef} className="home-country-top-float">
           <h1 className="home-country-top-float__title">
-            <span ref={topTitleRef} className="home-country-top-float__title-animate">
+            <span className="home-country-top-float__title-animate">
               {topTitle}
             </span>
           </h1>
