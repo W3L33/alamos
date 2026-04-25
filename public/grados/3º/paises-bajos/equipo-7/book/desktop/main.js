@@ -9,16 +9,27 @@ const url = '../archivo.pdf';
 let pdfDoc = null;
 let totalPaginas = 0;
 let images = [];
+let pageBaseWidth = 700;
+let pageBaseHeight = 900;
 let zoomScale = 1;
 let zoomTarget = 1;
 let zoomRaf = null;
 let zoomFocusX = 0;
 let zoomFocusY = 0;
+let pinchActivo = false;
+let pinchDistBase = 0;
+let zoomBase = 1;
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 2.6;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function distanciaEntreToques(t0, t1) {
+  const dx = t1.clientX - t0.clientX;
+  const dy = t1.clientY - t0.clientY;
+  return Math.hypot(dx, dy);
 }
 
 function applyZoomAt(clientX, clientY) {
@@ -27,6 +38,25 @@ function applyZoomAt(clientX, clientY) {
   const oy = ((clientY - rect.top) / rect.height) * 100;
   container.style.transformOrigin = `${clamp(ox, 0, 100)}% ${clamp(oy, 0, 100)}%`;
   container.style.transform = `translateZ(0) scale3d(${zoomScale}, ${zoomScale}, 1)`;
+}
+
+function updateBookOverflowMode() {
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+  const contentEl = document.getElementById("pdf-wrapper") || container;
+  const contentHeight = contentEl ? contentEl.scrollHeight : 0;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const exceedsViewport = contentHeight > viewportHeight + 2;
+
+  if (isLandscape && exceedsViewport) {
+    document.documentElement.style.overflowX = "hidden";
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.overflowX = "hidden";
+    document.body.style.overflowY = "auto";
+    return;
+  }
+
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
 }
 
 function setZoom(nextZoom, clientX, clientY) {
@@ -258,6 +288,32 @@ container.addEventListener("wheel", (e) => {
   setZoom(zoomScale * factor, e.clientX, e.clientY);
 }, { passive: false });
 
+container.addEventListener("touchstart", (e) => {
+  if (e.touches.length !== 2) return;
+  pinchActivo = true;
+  pinchDistBase = distanciaEntreToques(e.touches[0], e.touches[1]);
+  zoomBase = zoomScale;
+}, { passive: true });
+
+container.addEventListener("touchmove", (e) => {
+  if (e.touches.length !== 2 || !pinchActivo) return;
+  e.preventDefault();
+  const dist = distanciaEntreToques(e.touches[0], e.touches[1]);
+  const ratio = pinchDistBase > 0 ? dist / pinchDistBase : 1;
+  const nextZoom = clamp(zoomBase * ratio, ZOOM_MIN, ZOOM_MAX);
+  const cx = (e.touches[0].clientX + e.touches[1].clientX) * 0.5;
+  const cy = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+  setZoom(nextZoom, cx, cy);
+}, { passive: false });
+
+container.addEventListener("touchend", (e) => {
+  if (e.touches.length < 2) pinchActivo = false;
+}, { passive: true });
+
+container.addEventListener("touchcancel", () => {
+  pinchActivo = false;
+}, { passive: true });
+
 window.addEventListener("keydown", (e) => {
   // Atajo rapido para volver al tamaño normal.
   if (e.key === "0") {
@@ -272,11 +328,17 @@ window.addEventListener("keydown", (e) => {
 async function cargarPDF() {
   pdfDoc = await pdfjsLib.getDocument(url).promise;
   totalPaginas = pdfDoc.numPages;
+  // Mantener proporción real del PDF para evitar distorsión al escalar.
+  const probePage = await pdfDoc.getPage(1);
+  const probeViewport = probePage.getViewport({ scale: 1 });
+  const ratio = probeViewport.width / probeViewport.height;
+  pageBaseHeight = 980;
+  pageBaseWidth = Math.max(620, Math.round(pageBaseHeight * ratio));
 
-  const dpr = Math.min(window.devicePixelRatio || 1, 2.1);
-  const renderFactor = totalPaginas > 50 ? 1.2 : totalPaginas > 30 ? 1.3 : 1.45;
-  const minScale = totalPaginas > 50 ? 1.9 : totalPaginas > 30 ? 2.1 : 2.35;
-  const escala = Math.max(minScale, dpr * renderFactor);
+  // Render nítido estable (sin sobreescalado extremo que cause artefactos).
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const qualityBoost = window.innerWidth <= 768 ? 2.25 : 1.95;
+  const escala = Math.min(4.2, Math.max(1.8, dpr * qualityBoost));
 
   // Renderizar todas las páginas
   for (let i = 1; i <= totalPaginas; i++) {
@@ -288,8 +350,8 @@ async function cargarPDF() {
     const ctx = canvas.getContext("2d", { alpha: false });
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    images.push(canvas.toDataURL("image/jpeg", 0.92));
+    await page.render({ canvasContext: ctx, viewport, intent: "display" }).promise;
+    images.push(canvas.toDataURL("image/png"));
   }
 
   // Agregar hoja final blanca si número de páginas impar
@@ -303,7 +365,7 @@ async function cargarPDF() {
     const ctxFinal = canvasFinal.getContext("2d");
     ctxFinal.fillStyle = "#ffffff";
     ctxFinal.fillRect(0, 0, canvasFinal.width, canvasFinal.height);
-    images.push(canvasFinal.toDataURL("image/jpeg", 0.92));
+    images.push(canvasFinal.toDataURL("image/png"));
   }
 
   iniciarFlipbook();
@@ -311,20 +373,28 @@ async function cargarPDF() {
 
 // -------------------- Inicializar flipbook --------------------
 function iniciarFlipbook() {
+  // Ajuste "contain": mostrar hoja completa sin recortes.
+  const availWidth = Math.max(320, Math.floor(window.innerWidth * 0.96));
+  const availHeight = Math.max(420, Math.floor(window.innerHeight * 0.9));
+  const fit = Math.min(availWidth / pageBaseWidth, availHeight / pageBaseHeight);
+  const bookWidth = Math.max(280, Math.floor(pageBaseWidth * fit));
+  const bookHeight = Math.max(360, Math.floor(pageBaseHeight * fit));
+
   const pageFlip = new St.PageFlip(container, {
-    width: 700,
-    height: 900,
-    size: "stretch",
-    minWidth: 400,
-    maxWidth: 1000,
-    minHeight: 300,
-    maxHeight: 800,
+    width: bookWidth,
+    height: bookHeight,
+    size: "fixed",
+    minWidth: bookWidth,
+    maxWidth: bookWidth,
+    minHeight: bookHeight,
+    maxHeight: bookHeight,
     drawShadow: true,
     showCover: false,
     backgroundColor: "#ffffff"
   });
 
   pageFlip.loadFromImages(images);
+  requestAnimationFrame(updateBookOverflowMode);
 
   function ensureKeyboardFocus() {
     try {
@@ -450,6 +520,9 @@ function iniciarFlipbook() {
     controles.style.display = 'flex';
     acciones.style.display = 'flex';
   });
+
+  window.addEventListener("resize", updateBookOverflowMode);
+  window.addEventListener("orientationchange", updateBookOverflowMode);
 }
 
 // -------------------- Ejecutar --------------------

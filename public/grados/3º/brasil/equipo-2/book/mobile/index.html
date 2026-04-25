@@ -20,6 +20,7 @@
 </script>
 <!-- PDF.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
 
 <!-- Tu JS principal -->
 <script src="main.js" defer></script>
@@ -27,16 +28,7 @@
 
 <body>
 
-<div id="pdf-wrapper">
-  <div id="flip-stage">
-    <div id="next-page" class="page-layer"></div>
-    <div id="sheet-shadow"></div>
-    <div id="sheet">
-      <div class="face front"></div>
-      <div class="face back"></div>
-    </div>
-  </div>
-</div>
+<div id="flipbook"></div>
 
 <footer>
   <div class="creator-float__circle-wrap">

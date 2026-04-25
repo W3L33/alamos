@@ -285,6 +285,36 @@ export default function Home() {
     }
   }, [selectedCountryKey, grade, handleGradeChange]);
 
+  useEffect(() => {
+    const isDesktopViewport = () =>
+      window.matchMedia("(min-width: 1025px)").matches;
+
+    const onKeyDown = (event) => {
+      if (!isDesktopViewport()) return;
+      if (grade == null) return;
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+      if (selectedCountryKey) {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          setSelectedCountryKey(null);
+        }
+        return;
+      }
+
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        const delta = event.key === "ArrowRight" ? 1 : -1;
+        const next = grade + delta;
+        const wrapped = next > 3 ? 1 : next < 1 ? 3 : next;
+        handleGradeChange(wrapped);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [grade, selectedCountryKey, handleGradeChange]);
+
   const onTouchStart = (e) => {
     touchStartX.current = e.changedTouches[0].screenX;
     touchStartY.current = e.changedTouches[0].screenY;
@@ -395,7 +425,7 @@ export default function Home() {
             onClick={() => setSelectedCountryKey(null)}
             aria-label="Volver a países"
           >
-            <i className="fa-solid fa-arrow-left" />
+            <i className="fa-solid fa-chevron-left" />
           </button>
         ) : null}
         <GradeFloat grade={grade} onChange={handleGradeChange} />
@@ -409,6 +439,16 @@ export default function Home() {
           <i className="fa-solid fa-circle-dot" />
         </button>
       </div>
+
+      <a
+        className="by-welee-fab"
+        aria-label="By WeLee"
+        href="https://w3l33.github.io"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        By WeLee
+      </a>
     </div>
   );
 }

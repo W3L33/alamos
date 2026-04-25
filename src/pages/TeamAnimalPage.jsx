@@ -228,7 +228,7 @@ export default function TeamAnimalPage() {
             onClick={handleBack}
             aria-label="Volver"
           >
-            <i className="fa-solid fa-arrow-left" />
+            <i className="fa-solid fa-chevron-left" />
           </button>
         </div>
         <h1 className="top-bar__title">

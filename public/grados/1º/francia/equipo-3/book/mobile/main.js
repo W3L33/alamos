@@ -1,31 +1,16 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-const stage = document.getElementById('flip-stage');
-const nextPageEl = document.getElementById('next-page');
-const shadowEl = document.getElementById('sheet-shadow');
-const sheetEl = document.getElementById('sheet');
-const frontEl = sheetEl.querySelector('.front');
-const backEl = sheetEl.querySelector('.back');
-const SLICE_COUNT = 1;
-
-const rutasPDF = ['../archivo.pdf', '/archivo.pdf', `${window.location.origin}/archivo.pdf`];
+const container = document.getElementById("flipbook");
+container.setAttribute("tabindex", "0");
+container.style.outline = "none";
+const url = '../archivo.pdf';
 
 let pdfDoc = null;
 let totalPaginas = 0;
-let paginaActual = 1;
-let escalaRender = 1.6;
-let animando = false;
-
-let dragActivo = false;
-let dragDireccion = null;
-let dragDestino = null;
-let dragProgress = 0;
-let startX = 0;
-let touchStartY = 0;
-let dragLastX = 0;
-let dragLastT = 0;
-let dragVelocityX = 0;
+let images = [];
+let pageBaseWidth = 700;
+let pageBaseHeight = 900;
 let zoomScale = 1;
 let zoomTarget = 1;
 let zoomRaf = null;
@@ -35,7 +20,7 @@ let pinchActivo = false;
 let pinchDistBase = 0;
 let zoomBase = 1;
 const ZOOM_MIN = 1;
-const ZOOM_MAX = 2.4;
+const ZOOM_MAX = 2.6;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -47,54 +32,61 @@ function distanciaEntreToques(t0, t1) {
   return Math.hypot(dx, dy);
 }
 
-function aplicarZoom(centerX, centerY) {
-  const rect = stage.getBoundingClientRect();
-  const ox = ((centerX - rect.left) / rect.width) * 100;
-  const oy = ((centerY - rect.top) / rect.height) * 100;
-  stage.style.transformOrigin = `${clamp(ox, 0, 100)}% ${clamp(oy, 0, 100)}%`;
-  stage.style.transform = `translateZ(0) scale3d(${zoomScale}, ${zoomScale}, 1)`;
+function applyZoomAt(clientX, clientY) {
+  const rect = container.getBoundingClientRect();
+  const ox = ((clientX - rect.left) / rect.width) * 100;
+  const oy = ((clientY - rect.top) / rect.height) * 100;
+  container.style.transformOrigin = `${clamp(ox, 0, 100)}% ${clamp(oy, 0, 100)}%`;
+  container.style.transform = `translateZ(0) scale3d(${zoomScale}, ${zoomScale}, 1)`;
 }
 
-function setZoom(nextZoom, centerX, centerY) {
+function updateBookOverflowMode() {
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+  const contentEl = document.getElementById("pdf-wrapper") || container;
+  const contentHeight = contentEl ? contentEl.scrollHeight : 0;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const exceedsViewport = contentHeight > viewportHeight + 2;
+
+  if (isLandscape && exceedsViewport) {
+    document.documentElement.style.overflowX = "hidden";
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.overflowX = "hidden";
+    document.body.style.overflowY = "auto";
+    return;
+  }
+
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+}
+
+function setZoom(nextZoom, clientX, clientY) {
   zoomTarget = clamp(nextZoom, ZOOM_MIN, ZOOM_MAX);
-  zoomFocusX = centerX;
-  zoomFocusY = centerY;
+  zoomFocusX = clientX;
+  zoomFocusY = clientY;
   if (zoomRaf) return;
   const tick = () => {
     const delta = zoomTarget - zoomScale;
     if (Math.abs(delta) < 0.0015) {
       zoomScale = zoomTarget;
-      aplicarZoom(zoomFocusX, zoomFocusY);
+      applyZoomAt(zoomFocusX, zoomFocusY);
       zoomRaf = null;
       return;
     }
     zoomScale += delta * 0.22;
-    aplicarZoom(zoomFocusX, zoomFocusY);
+    applyZoomAt(zoomFocusX, zoomFocusY);
     zoomRaf = requestAnimationFrame(tick);
   };
   zoomRaf = requestAnimationFrame(tick);
 }
 
-const pageCache = new Map();
-const MAX_CACHE = 6;
-
-const frontSlices = [];
-const backSlices = [];
-
-function getSliceBackgroundPos(i) {
-  if (SLICE_COUNT <= 1) return '50% 0%';
-  return `${(i / (SLICE_COUNT - 1)) * 100}% 0%`;
-}
-
-
-
+// -------------------- Controles flotantes --------------------
 const controles = document.createElement('div');
 controles.style.position = 'fixed';
-controles.style.bottom = '14px';
+controles.style.bottom = '12px';
 controles.style.left = '50%';
 controles.style.transform = 'translateX(-50%)';
 controles.style.display = 'flex';
-controles.style.gap = '5px';
+controles.style.gap = '8px';
 controles.style.zIndex = 1000;
 
 function crearBoton(iconoSvg, label) {
@@ -103,23 +95,27 @@ function crearBoton(iconoSvg, label) {
   btn.innerHTML = iconoSvg;
   btn.setAttribute('aria-label', label);
   btn.setAttribute('title', label);
-  btn.style.width = '27px';
-  btn.style.height = '27px';
+
+  btn.style.width = '32px';
+  btn.style.height = '32px';
   btn.style.padding = '0';
   btn.style.cursor = 'pointer';
   btn.style.background = 'rgba(90, 90, 90, 0.35)';
   btn.style.backdropFilter = 'blur(8px)';
   btn.style.webkitBackdropFilter = 'blur(8px)';
-  btn.style.border = '1px solid rgba(255,255,255,0.3)';
+  btn.style.border = '1px solid #b4f7ff';
   btn.style.borderRadius = '999px';
   btn.style.color = '#fff';
   btn.style.opacity = '0.45';
+  btn.style.boxShadow = '0 0 12px rgba(100, 227, 255, 0.18)';
   btn.style.display = 'inline-flex';
   btn.style.alignItems = 'center';
   btn.style.justifyContent = 'center';
   btn.style.pointerEvents = 'auto';
-  btn.onmouseenter = () => { btn.style.opacity = '0.85'; };
-  btn.onmouseleave = () => { btn.style.opacity = '0.45'; };
+
+  btn.onmouseenter = () => btn.style.opacity = '0.85';
+  btn.onmouseleave = () => btn.style.opacity = '0.45';
+
   return btn;
 }
 
@@ -189,15 +185,15 @@ function hideLoader() {
   loaderWrap.style.display = "none";
 }
 
-const iconBack10 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 7l-5 5 5 5"/><path d="M18 7l-5 5 5 5"/></svg>';
-const iconBack1 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 7l-5 5 5 5"/></svg>';
-const iconNext1 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l5 5-5 5"/></svg>';
-const iconNext10 = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7l5 5-5 5"/><path d="M13 7l5 5-5 5"/></svg>';
+const iconBack10 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 7l-5 5 5 5"/><path d="M18 7l-5 5 5 5"/></svg>';
+const iconBack1 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 7l-5 5 5 5"/></svg>';
+const iconNext1 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l5 5-5 5"/></svg>';
+const iconNext10 = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7l5 5-5 5"/><path d="M13 7l5 5-5 5"/></svg>';
 
 const btnMenos10 = crearBoton(iconBack10, 'Retroceder 10 paginas');
-const btnMenos1 = crearBoton(iconBack1, 'Pagina anterior');
-const btnMas1 = crearBoton(iconNext1, 'Pagina siguiente');
-const btnMas10 = crearBoton(iconNext10, 'Avanzar 10 paginas');
+const btnMenos1  = crearBoton(iconBack1, 'Pagina anterior');
+const btnMas1    = crearBoton(iconNext1, 'Pagina siguiente');
+const btnMas10   = crearBoton(iconNext10, 'Avanzar 10 paginas');
 
 function postEmbedAction(type) {
   if (window.parent && window.parent !== window) {
@@ -220,35 +216,36 @@ function crearBotonAccion(iconoSvg, label) {
   btn.innerHTML = iconoSvg;
   btn.setAttribute("aria-label", label);
   btn.setAttribute("title", label);
-  btn.style.height = "28px";
-  btn.style.width = "28px";
+  btn.style.height = "32px";
+  btn.style.width = "32px";
   btn.style.padding = "0";
   btn.style.cursor = "pointer";
   btn.style.background = "rgba(90, 90, 90, 0.35)";
   btn.style.backdropFilter = "blur(8px)";
   btn.style.webkitBackdropFilter = "blur(8px)";
-  btn.style.border = "1px solid rgba(255,255,255,0.3)";
+  btn.style.border = "1px solid #b4f7ff";
   btn.style.borderRadius = "999px";
   btn.style.color = "#fff";
   btn.style.fontSize = "0";
   btn.style.lineHeight = "0";
-  btn.style.opacity = "0.78";
-  btn.onmouseenter = () => { btn.style.opacity = "1"; };
-  btn.onmouseleave = () => { btn.style.opacity = "0.78"; };
+  btn.style.opacity = "0.75";
+  btn.style.boxShadow = "0 0 12px rgba(100, 227, 255, 0.18)";
+  btn.onmouseenter = () => (btn.style.opacity = "1");
+  btn.onmouseleave = () => (btn.style.opacity = "0.75");
   return btn;
 }
 
 const acciones = document.createElement("div");
 acciones.style.position = "fixed";
 acciones.style.left = "50%";
-acciones.style.top = "10px";
+acciones.style.top = "12px";
 acciones.style.transform = "translateX(-50%)";
 acciones.style.display = "flex";
-acciones.style.gap = "6px";
-acciones.style.zIndex = "10002";
+acciones.style.gap = "8px";
+acciones.style.zIndex = "1001";
 
-const iconBack = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 7l-5 5 5 5"/></svg>';
-const iconHome = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
+const iconBack = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 7l-5 5 5 5"/></svg>';
+const iconHome = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
 
 const btnBack = crearBotonAccion(iconBack, "Regresar");
 btnBack.onclick = () => postEmbedAction("alamos-embed-back");
@@ -258,8 +255,10 @@ acciones.append(btnBack, btnHome);
 document.body.appendChild(acciones);
 acciones.style.display = "none";
 
+// Indicador de página
 const indicadorPagina = document.createElement('span');
-indicadorPagina.style.padding = '4px 5px';
+indicadorPagina.style.minWidth = '38px';
+indicadorPagina.style.padding = '4px 6px';
 indicadorPagina.style.fontSize = 'clamp(0.65rem, 1.2vw, 0.75rem)';
 indicadorPagina.style.color = '#fff';
 indicadorPagina.style.fontWeight = '600';
@@ -269,412 +268,268 @@ indicadorPagina.style.borderRadius = '6px';
 indicadorPagina.style.display = 'flex';
 indicadorPagina.style.alignItems = 'center';
 indicadorPagina.style.justifyContent = 'center';
-indicadorPagina.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+indicadorPagina.style.fontFamily =
+  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+indicadorPagina.style.fontVariantNumeric = 'tabular-nums';
+indicadorPagina.style.fontFeatureSettings = '"tnum"';
 indicadorPagina.style.whiteSpace = 'nowrap';
 
 controles.append(btnMenos10, btnMenos1, indicadorPagina, btnMas1, btnMas10);
 document.body.appendChild(controles);
 controles.style.display = "none";
 
-function actualizarIndicador() {
-  indicadorPagina.textContent = `${paginaActual} / ${totalPaginas}`;
-}
-
-function recortarCache() {
-  if (pageCache.size <= MAX_CACHE) return;
-  const keys = Array.from(pageCache.keys());
-  keys.sort((a, b) => Math.abs(a - paginaActual) - Math.abs(b - paginaActual));
-  while (keys.length > MAX_CACHE) {
-    pageCache.delete(keys.pop());
-  }
-}
-
-async function cargarPDF() {
-  let ultimoError = null;
-  for (const ruta of rutasPDF) {
-    try {
-      pdfDoc = await pdfjsLib.getDocument({ url: ruta, rangeChunkSize: 262144 }).promise;
-      break;
-    } catch (err) {
-      ultimoError = err;
-    }
-  }
-  if (!pdfDoc) {
-    for (const ruta of rutasPDF) {
-      try {
-        pdfDoc = await pdfjsLib.getDocument({ url: ruta, disableWorker: true, rangeChunkSize: 262144 }).promise;
-        break;
-      } catch (err) {
-        ultimoError = err;
-      }
-    }
-  }
-  if (!pdfDoc) throw (ultimoError || new Error('No se pudo abrir archivo.pdf'));
-
-  totalPaginas = pdfDoc.numPages;
-  const escalaBase = Math.min(window.devicePixelRatio || 1, 2);
-  escalaRender = window.innerWidth <= 768 ? Math.max(1.6, escalaBase * 1.2) : 1.8;
-}
-
-async function renderPaginaAImagen(num) {
-  if (pageCache.has(num)) return pageCache.get(num);
-  const page = await pdfDoc.getPage(num);
-  const rect = stage.getBoundingClientRect();
-  const viewportBase = page.getViewport({ scale: 1 });
-  const fit = Math.min(rect.width / viewportBase.width, rect.height / viewportBase.height);
-  const viewport = page.getViewport({ scale: Math.max(fit * escalaRender, fit) });
-  const c = document.createElement('canvas');
-  c.width = Math.floor(viewport.width);
-  c.height = Math.floor(viewport.height);
-  const rctx = c.getContext('2d', { alpha: false });
-  await page.render({ canvasContext: rctx, viewport }).promise;
-  const url = c.toDataURL('image/jpeg', 0.9);
-  pageCache.set(num, url);
-  recortarCache();
-  return url;
-}
-
-function ease(t) {
-  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
-
-function aplicarMascaraCurva(progress, direction) {
-  const p = Math.max(0, Math.min(1, progress));
-  if (p < 0.02) {
-    const rect = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
-    sheetEl.style.clipPath = rect;
-    sheetEl.style.webkitClipPath = rect;
-    return;
-  }
-
-  const slices = 12;
-  const depth = 1.4 + Math.sin(p * Math.PI) * 6.2; // porcentaje de curvatura
-  const pts = [];
-
-  if (direction === 'izquierda') {
-    pts.push('0% 0%');
-    for (let i = 0; i <= slices; i += 1) {
-      const y = (i / slices) * 100;
-      const t = i / slices;
-      const curve = 1 - Math.pow((t - 0.5) / 0.5, 2); // parabola con pico al centro
-      const x = 100 - depth * Math.max(0, curve);
-      pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
-    }
-    pts.push('0% 100%');
-  } else {
-    pts.push('100% 0%');
-    for (let i = 0; i <= slices; i += 1) {
-      const y = (i / slices) * 100;
-      const t = i / slices;
-      const curve = 1 - Math.pow((t - 0.5) / 0.5, 2);
-      const x = depth * Math.max(0, curve);
-      pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
-    }
-    pts.push('100% 100%');
-  }
-
-  const polygon = `polygon(${pts.join(', ')})`;
-  sheetEl.style.clipPath = polygon;
-  sheetEl.style.webkitClipPath = polygon;
-}
-
-function aplicarProgreso(progress, direction) {
-  const p = Math.max(0, Math.min(1, progress));
-  // Origen corregido para que el giro siga el sentido del gesto.
-  const origin = direction === 'izquierda' ? 'left center' : 'right center';
-  // Sentido corregido: swipe izquierda -> hoja gira hacia la izquierda.
-  const ang = direction === 'izquierda' ? 180 * p : -180 * p;
-  const arco = Math.sin(p * Math.PI);
-  const dir = direction === 'izquierda' ? -1 : 1;
-  const flex = dir * arco * 4.2;
-  const comp = 1 - arco * 0.07;
-  const shiftX = dir * arco * 12;
-  const shiftY = -arco * 8;
-  const pitch = (0.5 - p) * 10;
-
-  sheetEl.style.transformOrigin = origin;
-  sheetEl.style.transform =
-    `translate3d(${shiftX}px, ${shiftY}px, 0) rotateX(${pitch}deg) rotateY(${ang}deg) skewY(${flex}deg) scaleX(${comp})`;
-  aplicarMascaraCurva(p, direction);
-
-  // Sombra real de la hoja en movimiento.
-  const shadowDepth = 6 + 22 * arco;
-  const shadowSpread = 2 + 10 * arco;
-  const shadowAlpha = 0.1 + 0.2 * arco;
-  sheetEl.style.filter =
-    `drop-shadow(${dir * 2}px ${shadowSpread}px ${shadowDepth}px rgba(0,0,0,${shadowAlpha}))`;
-
-  // Sin segmentacion visible para evitar efecto cortina/franjas.
-  const allSlices = frontSlices.concat(backSlices);
-  for (let i = 0; i < allSlices.length; i += 1) {
-    allSlices[i].style.transform = 'translate3d(0, 0, 0) rotateY(0deg) scaleX(1)';
-  }
-
-  const shadowOpacity = Math.min(0.24, 0.06 + Math.sin(p * Math.PI) * 0.2);
-  shadowEl.style.opacity = String(shadowOpacity);
-  shadowEl.style.background = direction === 'izquierda'
-    ? 'linear-gradient(to left, rgba(0,0,0,0.2), rgba(0,0,0,0) 42%)'
-    : 'linear-gradient(to right, rgba(0,0,0,0.2), rgba(0,0,0,0) 42%)';
-}
-
-async function prepararCapas(targetPage) {
-  const actualSrc = await renderPaginaAImagen(paginaActual);
-  const nextSrc = await renderPaginaAImagen(targetPage);
-  for (let i = 0; i < SLICE_COUNT; i += 1) {
-    const pos = getSliceBackgroundPos(i);
-    frontSlices[i].style.backgroundImage = `url("${actualSrc}")`;
-    frontSlices[i].style.backgroundPosition = pos;
-    backSlices[i].style.backgroundImage = `url("${actualSrc}")`;
-    backSlices[i].style.backgroundPosition = pos;
-  }
-  nextPageEl.style.backgroundImage = `url("${nextSrc}")`;
-}
-
-async function renderEstadoBase() {
-  const src = await renderPaginaAImagen(paginaActual);
-  for (let i = 0; i < SLICE_COUNT; i += 1) {
-    const pos = getSliceBackgroundPos(i);
-    frontSlices[i].style.backgroundImage = `url("${src}")`;
-    frontSlices[i].style.backgroundPosition = pos;
-    backSlices[i].style.backgroundImage = `url("${src}")`;
-    backSlices[i].style.backgroundPosition = pos;
-    frontSlices[i].style.transform = 'translateZ(0) rotateY(0deg) scaleX(1)';
-    backSlices[i].style.transform = 'translateZ(0) rotateY(0deg) scaleX(1)';
-  }
-  nextPageEl.style.backgroundImage = `url("${src}")`;
-  sheetEl.style.transform = 'rotateY(0deg) skewY(0deg) scaleX(1)';
-  sheetEl.style.transformOrigin = 'right center';
-  const rect = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
-  sheetEl.style.clipPath = rect;
-  sheetEl.style.webkitClipPath = rect;
-  sheetEl.style.filter = 'none';
-  shadowEl.style.opacity = '0';
-  actualizarIndicador();
-}
-
-function resolverDestino(delta) {
-  return Math.max(1, Math.min(totalPaginas, paginaActual + delta));
-}
-
-async function animarCambio(destino, startProgress, direction) {
-  if (animando) return;
-  animando = true;
-  const dur = Math.max(180, 360 * (1 - startProgress));
-  const t0 = performance.now();
-  function tick(now) {
-    const tr = Math.min(1, (now - t0) / dur);
-    const p = startProgress + (1 - startProgress) * ease(tr);
-    aplicarProgreso(p, direction);
-    if (tr < 1) return requestAnimationFrame(tick);
-    paginaActual = destino;
-    renderEstadoBase().finally(() => {
-      animando = false;
-    });
-  }
-  requestAnimationFrame(tick);
-}
-
-async function animarVuelta(fromProgress, direction) {
-  if (animando) return;
-  animando = true;
-  const dur = Math.max(140, 260 * Math.max(0.2, fromProgress));
-  const t0 = performance.now();
-  function tick(now) {
-    const tr = Math.min(1, (now - t0) / dur);
-    const p = fromProgress * (1 - ease(tr));
-    aplicarProgreso(p, direction);
-    if (tr < 1) return requestAnimationFrame(tick);
-    renderEstadoBase().finally(() => {
-      animando = false;
-    });
-  }
-  requestAnimationFrame(tick);
-}
-
-function iniciarDrag(x) {
-  dragActivo = true;
-  dragProgress = 0;
-  dragDireccion = null;
-  dragDestino = null;
-  startX = x;
-  dragLastX = x;
-  dragLastT = performance.now();
-  dragVelocityX = 0;
-}
-
-async function moverDrag(x) {
-  if (!dragActivo || animando) return;
-  const diff = startX - x;
-  const now = performance.now();
-  const dt = Math.max(1, now - dragLastT);
-  dragVelocityX = dragVelocityX * 0.75 + ((x - dragLastX) / dt) * 0.25;
-  dragLastX = x;
-  dragLastT = now;
-
-  if (!dragDireccion && Math.abs(diff) > 12) {
-    dragDireccion = diff > 0 ? 'izquierda' : 'derecha';
-    dragDestino = resolverDestino(dragDireccion === 'izquierda' ? 1 : -1);
-    if (dragDestino === paginaActual) {
-      dragActivo = false;
-      return;
-    }
-    await prepararCapas(dragDestino);
-  }
-  if (!dragDireccion) return;
-
-  const ref = Math.max(1, stage.clientWidth * 0.8);
-  dragProgress = Math.max(0, Math.min(1, Math.abs(diff) / ref));
-  aplicarProgreso(dragProgress, dragDireccion);
-}
-
-function finalizarDrag(x) {
-  if (!dragActivo || animando || !dragDireccion) return;
-  const diff = startX - x;
-  const absDiff = Math.abs(diff);
-  const mismaDir = (diff > 0 && dragDireccion === 'izquierda') || (diff < 0 && dragDireccion === 'derecha');
-  const velocidad = Math.abs(dragVelocityX);
-  const impulso = (dragDireccion === 'izquierda' && dragVelocityX < 0) || (dragDireccion === 'derecha' && dragVelocityX > 0);
-  const completar = mismaDir && (dragProgress > 0.42 || absDiff > stage.clientWidth * 0.28 || (impulso && velocidad > 0.28));
-  dragActivo = false;
-  if (completar) animarCambio(dragDestino, dragProgress, dragDireccion);
-  else animarVuelta(dragProgress, dragDireccion);
-}
-
-async function cambiarPagina(delta) {
-  const destino = resolverDestino(delta);
-  if (destino === paginaActual || animando) return;
-  const dir = delta > 0 ? 'izquierda' : 'derecha';
-  await prepararCapas(destino);
-  animarCambio(destino, 0, dir);
-}
-
-window.addEventListener('resize', () => {
-  pageCache.clear();
-  renderEstadoBase().catch(console.error);
-});
-
-stage.addEventListener('touchstart', (e) => {
-  if (animando) return;
-  if (e.touches.length === 2) {
-    pinchActivo = true;
-    dragActivo = false;
-    pinchDistBase = distanciaEntreToques(e.touches[0], e.touches[1]);
-    zoomBase = zoomScale;
-    return;
-  }
-  touchStartY = e.touches[0].clientY;
-  iniciarDrag(e.touches[0].clientX);
-});
-
-stage.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 2) {
-    e.preventDefault();
-    const dist = distanciaEntreToques(e.touches[0], e.touches[1]);
-    if (!pinchActivo) {
-      pinchActivo = true;
-      dragActivo = false;
-      pinchDistBase = dist;
-      zoomBase = zoomScale;
-    }
-    const ratio = pinchDistBase > 0 ? dist / pinchDistBase : 1;
-    const nextZoom = clamp(zoomBase * ratio, ZOOM_MIN, ZOOM_MAX);
-    const cx = (e.touches[0].clientX + e.touches[1].clientX) * 0.5;
-    const cy = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
-    setZoom(nextZoom, cx, cy);
-    return;
-  }
-  const moveX = e.touches[0].clientX;
-  const moveY = e.touches[0].clientY;
-  const deltaX = Math.abs(moveX - startX);
-  const deltaY = Math.abs(moveY - touchStartY);
-
-  if (deltaY > deltaX + 6) {
-    dragActivo = false;
-    return;
-  }
-
-  e.preventDefault();
-  moverDrag(moveX).catch(console.error);
-}, { passive: false });
-
-stage.addEventListener('touchend', (e) => {
-  if (pinchActivo) {
-    if (e.touches.length < 2) pinchActivo = false;
-    return;
-  }
-  finalizarDrag(e.changedTouches[0].clientX);
-});
-stage.addEventListener('touchcancel', () => {
-  pinchActivo = false;
-  dragActivo = false;
-  renderEstadoBase().catch(console.error);
-});
-
-stage.style.willChange = 'transform';
-stage.style.transition = 'none';
-stage.style.backfaceVisibility = 'hidden';
-stage.addEventListener('wheel', (e) => {
-  // Soporte adicional para zoom con trackpad/mouse en dispositivos compatibles.
+container.style.willChange = "transform";
+container.style.transition = "none";
+container.style.backfaceVisibility = "hidden";
+container.addEventListener("wheel", (e) => {
+  // Permite zoom con mouse/trackpad directamente sobre el libro.
   e.preventDefault();
   const factor = e.deltaY < 0 ? 1.08 : 0.92;
-  setZoom(zoomTarget * factor, e.clientX, e.clientY);
+  setZoom(zoomScale * factor, e.clientX, e.clientY);
 }, { passive: false });
 
-function bindNavButton(btn, handler) {
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handler();
-  });
-  btn.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handler();
-  }, { passive: false });
-}
+container.addEventListener("touchstart", (e) => {
+  if (e.touches.length !== 2) return;
+  pinchActivo = true;
+  pinchDistBase = distanciaEntreToques(e.touches[0], e.touches[1]);
+  zoomBase = zoomScale;
+}, { passive: true });
 
-bindNavButton(btnMenos1, () => { cambiarPagina(-1).catch(console.error); });
-bindNavButton(btnMas1, () => { cambiarPagina(1).catch(console.error); });
-bindNavButton(btnMenos10, () => { cambiarPagina(-10).catch(console.error); });
-bindNavButton(btnMas10, () => { cambiarPagina(10).catch(console.error); });
+container.addEventListener("touchmove", (e) => {
+  if (e.touches.length !== 2 || !pinchActivo) return;
+  e.preventDefault();
+  const dist = distanciaEntreToques(e.touches[0], e.touches[1]);
+  const ratio = pinchDistBase > 0 ? dist / pinchDistBase : 1;
+  const nextZoom = clamp(zoomBase * ratio, ZOOM_MIN, ZOOM_MAX);
+  const cx = (e.touches[0].clientX + e.touches[1].clientX) * 0.5;
+  const cy = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+  setZoom(nextZoom, cx, cy);
+}, { passive: false });
 
-async function iniciar() {
-  frontEl.style.setProperty('--slice-count', String(SLICE_COUNT));
-  backEl.style.setProperty('--slice-count', String(SLICE_COUNT));
-  const frontInner = document.createElement('div');
-  frontInner.className = 'face-inner';
-  const backInner = document.createElement('div');
-  backInner.className = 'face-inner';
-  frontEl.appendChild(frontInner);
-  backEl.appendChild(backInner);
-  for (let i = 0; i < SLICE_COUNT; i += 1) {
-    const fs = document.createElement('div');
-    fs.className = 'slice';
-    const bs = document.createElement('div');
-    bs.className = 'slice';
-    frontInner.appendChild(fs);
-    backInner.appendChild(bs);
-    frontSlices.push(fs);
-    backSlices.push(bs);
+container.addEventListener("touchend", (e) => {
+  if (e.touches.length < 2) pinchActivo = false;
+}, { passive: true });
+
+container.addEventListener("touchcancel", () => {
+  pinchActivo = false;
+}, { passive: true });
+
+window.addEventListener("keydown", (e) => {
+  // Atajo rapido para volver al tamaño normal.
+  if (e.key === "0") {
+    zoomScale = 1;
+    zoomTarget = 1;
+    container.style.transformOrigin = "50% 50%";
+    container.style.transform = "translateZ(0) scale3d(1, 1, 1)";
+  }
+});
+
+// -------------------- Cargar PDF --------------------
+async function cargarPDF() {
+  pdfDoc = await pdfjsLib.getDocument(url).promise;
+  totalPaginas = pdfDoc.numPages;
+  // Mantener proporción real del PDF para evitar distorsión al escalar.
+  const probePage = await pdfDoc.getPage(1);
+  const probeViewport = probePage.getViewport({ scale: 1 });
+  const ratio = probeViewport.width / probeViewport.height;
+  pageBaseHeight = 980;
+  pageBaseWidth = Math.max(620, Math.round(pageBaseHeight * ratio));
+
+  // Render nítido estable (sin sobreescalado extremo que cause artefactos).
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const qualityBoost = window.innerWidth <= 768 ? 2.25 : 1.95;
+  const escala = Math.min(4.2, Math.max(1.8, dpr * qualityBoost));
+
+  // Renderizar todas las páginas
+  for (let i = 1; i <= totalPaginas; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: escala });
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    await page.render({ canvasContext: ctx, viewport, intent: "display" }).promise;
+    images.push(canvas.toDataURL("image/png"));
   }
 
-  showLoader();
-  await cargarPDF();
-  await renderEstadoBase();
-  hideLoader();
-  controles.style.display = 'flex';
-  acciones.style.display = 'flex';
-  setTimeout(() => {
-    renderPaginaAImagen(Math.min(totalPaginas, paginaActual + 1)).catch(() => {});
-    renderPaginaAImagen(Math.max(1, paginaActual - 1)).catch(() => {});
-  }, 0);
+  // Agregar hoja final blanca si número de páginas impar
+  if (totalPaginas % 2 !== 0) {
+    const canvasFinal = document.createElement("canvas");
+    const lastImg = new Image();
+    lastImg.src = images[images.length - 1];
+    await new Promise(res => lastImg.onload = res);
+    canvasFinal.width = lastImg.width;
+    canvasFinal.height = lastImg.height;
+    const ctxFinal = canvasFinal.getContext("2d");
+    ctxFinal.fillStyle = "#ffffff";
+    ctxFinal.fillRect(0, 0, canvasFinal.width, canvasFinal.height);
+    images.push(canvasFinal.toDataURL("image/png"));
+  }
+
+  iniciarFlipbook();
 }
 
-iniciar().catch((error) => {
-  indicadorPagina.textContent = 'Error';
-  controles.style.display = "none";
-  acciones.style.display = "none";
-  const detalle = error && error.message ? error.message : String(error);
-  showLoader();
+// -------------------- Inicializar flipbook --------------------
+function iniciarFlipbook() {
+  // Ajuste "contain": mostrar hoja completa sin recortes.
+  const availWidth = Math.max(320, Math.floor(window.innerWidth * 0.96));
+  const availHeight = Math.max(420, Math.floor(window.innerHeight * 0.9));
+  const fit = Math.min(availWidth / pageBaseWidth, availHeight / pageBaseHeight);
+  const bookWidth = Math.max(280, Math.floor(pageBaseWidth * fit));
+  const bookHeight = Math.max(360, Math.floor(pageBaseHeight * fit));
+
+  const pageFlip = new St.PageFlip(container, {
+    width: bookWidth,
+    height: bookHeight,
+    size: "fixed",
+    minWidth: bookWidth,
+    maxWidth: bookWidth,
+    minHeight: bookHeight,
+    maxHeight: bookHeight,
+    drawShadow: true,
+    showCover: false,
+    backgroundColor: "#ffffff"
+  });
+
+  pageFlip.loadFromImages(images);
+  requestAnimationFrame(updateBookOverflowMode);
+
+  function ensureKeyboardFocus() {
+    try {
+      window.focus();
+      container.focus({ preventScroll: true });
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function currentIndex() {
+    return typeof pageFlip.getCurrentPageIndex === "function"
+      ? pageFlip.getCurrentPageIndex()
+      : 0;
+  }
+
+  function flipTo(target) {
+    const next = Math.max(0, Math.min(images.length - 1, target));
+    if (typeof pageFlip.flip === "function") {
+      pageFlip.flip(next);
+      return;
+    }
+    if (typeof pageFlip.turnToPage === "function") {
+      pageFlip.turnToPage(next);
+    }
+  }
+
+  function flipPrev() {
+    if (typeof pageFlip.flipPrev === "function") {
+      pageFlip.flipPrev();
+      return;
+    }
+    flipTo(currentIndex() - 1);
+  }
+
+  function flipNext() {
+    if (typeof pageFlip.flipNext === "function") {
+      pageFlip.flipNext();
+      return;
+    }
+    flipTo(currentIndex() + 1);
+  }
+
+  // -------------------- Funciones de navegación --------------------
+  function avanzarPaginas(n) {
+    let target = currentIndex() + n;
+    if (target > images.length - 1) target = images.length - 1;
+    flipTo(target);
+  }
+
+  function retrocederPaginas(n) {
+    let target = currentIndex() - n;
+    if (target < 0) target = 0;
+    flipTo(target);
+  }
+
+  // -------------------- Controles --------------------
+  btnMenos1.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    flipPrev();
+  });
+  btnMas1.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    flipNext();
+  });
+  btnMas10.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    avanzarPaginas(10);
+  });
+  btnMenos10.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    retrocederPaginas(10);
+  });
+
+  // Navegación por teclado (desktop): listeners globales y foco persistente.
+  const onKeyDown = (e) => {
+    const active = document.activeElement;
+    const isTypingTarget =
+      active &&
+      (active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.isContentEditable);
+    if (isTypingTarget) return;
+
+    const key = e.key;
+    const lower = typeof key === "string" ? key.toLowerCase() : "";
+    const isPrev = key === "ArrowLeft" || key === "PageUp" || lower === "a";
+    const isNext =
+      key === "ArrowRight" || key === "PageDown" || key === " " || lower === "d";
+    if (!isPrev && !isNext) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    ensureKeyboardFocus();
+    if (isPrev) flipPrev();
+    if (isNext) flipNext();
+  };
+  window.addEventListener("keydown", onKeyDown, true);
+  document.addEventListener("keydown", onKeyDown, true);
+
+  // Si el usuario vuelve a interactuar con el libro, recuperamos foco de teclado.
+  container.addEventListener("pointerdown", ensureKeyboardFocus);
+  container.addEventListener("mousedown", ensureKeyboardFocus);
+  container.addEventListener("touchstart", ensureKeyboardFocus, { passive: true });
+  container.addEventListener("mouseenter", ensureKeyboardFocus);
+  ensureKeyboardFocus();
+
+  // Actualizar indicador de página
+  pageFlip.on("flip", (e) => {
+    const index = e.data; // índice interno del flipbook
+    indicadorPagina.textContent = `${index + 1} / ${images.length}`;
+  });
+
+  // Inicializar indicador
+  indicadorPagina.textContent = `1 / ${images.length}`;
+
+  requestAnimationFrame(() => {
+    hideLoader();
+    controles.style.display = 'flex';
+    acciones.style.display = 'flex';
+  });
+
+  window.addEventListener("resize", updateBookOverflowMode);
+  window.addEventListener("orientationchange", updateBookOverflowMode);
+}
+
+// -------------------- Ejecutar --------------------
+showLoader();
+cargarPDF().catch((error) => {
   console.error(error);
+  showLoader();
 });
+
+
