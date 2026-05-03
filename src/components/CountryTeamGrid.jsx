@@ -22,6 +22,7 @@ import {
   teamPhotoPublicUrl,
   teamPhotoPublicUrlFromBase,
 } from "../utils/teamAnimalsJson.js";
+import { loadTeamMembersByTeamId } from "../utils/teamMembers.js";
 
 function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
   const { night } = useTheme();
@@ -62,6 +63,11 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
     }
     if (grade === 2) {
       return randomPhotoUrlFromManifest(folderId, manifest ?? {}, 2);
+    }
+    // 1º: priorizar manifiesto (estado real del disco) y usar animals.json como fallback.
+    const fromManifest = randomPhotoUrlFromManifest(folderId, manifest ?? {}, 1);
+    if (fromManifest !== DEFAULT_TEAM_IMAGE) {
+      return fromManifest;
     }
     const fromList = pickRandomAnimalPhotoEntry(animalsEntries);
     if (fromList) {
@@ -158,6 +164,7 @@ function TeamCardLink({ card, countryKey, grade, manifest, animalsEntries }) {
 export default function CountryTeamGrid({ countryKey, grade }) {
   const [manifest, setManifest] = useState(null);
   const [animalsByFolder, setAnimalsByFolder] = useState({});
+  const [membersByTeamId, setMembersByTeamId] = useState({});
   const isGrade3 = grade === 3 || Number(grade) === 3;
 
   useEffect(() => {
@@ -227,7 +234,23 @@ export default function CountryTeamGrid({ countryKey, grade }) {
     }
   }, [manifest, countryKey, grade]);
 
-  const cards = getTeamCardPlaceholders();
+  useEffect(() => {
+    let active = true;
+    async function loadMembers() {
+      const data = await loadTeamMembersByTeamId(countryKey, grade, TEAM_COUNT);
+      if (active) setMembersByTeamId(data);
+    }
+    if (countryKey != null) {
+      loadMembers();
+    } else if (active) {
+      setMembersByTeamId({});
+    }
+    return () => {
+      active = false;
+    };
+  }, [countryKey, grade]);
+
+  const cards = getTeamCardPlaceholders(membersByTeamId).filter((card) => !card.hidden);
 
   return (
     <div className="team-grid">

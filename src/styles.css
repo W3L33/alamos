@@ -2119,7 +2119,10 @@ body.day .content-grid:not(.content-grid--teams) > .glass-tile.glass-tile--actio
   }
 
   .page-home--no-toolbar .content-grid:not(.content-grid--teams) > .glass-tile.glass-tile--action {
-    width: 100%;
+    width: 60%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    justify-self: center;
   }
 }
 

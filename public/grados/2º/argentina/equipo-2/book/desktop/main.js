@@ -1,4 +1,4 @@
-pdfjsLib.GlobalWorkerOptions.workerSrc =
+﻿pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 const container = document.getElementById("flipbook");
@@ -100,21 +100,21 @@ function crearBoton(iconoSvg, label) {
   btn.style.height = '32px';
   btn.style.padding = '0';
   btn.style.cursor = 'pointer';
-  btn.style.background = 'rgba(90, 90, 90, 0.35)';
+  btn.style.background = 'rgba(70, 74, 84, 0.78)';
   btn.style.backdropFilter = 'blur(8px)';
   btn.style.webkitBackdropFilter = 'blur(8px)';
-  btn.style.border = '1px solid #b4f7ff';
+  btn.style.border = '1px solid rgba(180, 247, 255, 0.95)';
   btn.style.borderRadius = '999px';
   btn.style.color = '#fff';
-  btn.style.opacity = '0.45';
-  btn.style.boxShadow = '0 0 12px rgba(100, 227, 255, 0.18)';
+  btn.style.opacity = '1';
+  btn.style.boxShadow = '0 0 18px rgba(100, 227, 255, 0.35)';
   btn.style.display = 'inline-flex';
   btn.style.alignItems = 'center';
   btn.style.justifyContent = 'center';
   btn.style.pointerEvents = 'auto';
 
-  btn.onmouseenter = () => btn.style.opacity = '0.85';
-  btn.onmouseleave = () => btn.style.opacity = '0.45';
+  btn.onmouseenter = () => btn.style.opacity = '1';
+  btn.onmouseleave = () => btn.style.opacity = '1';
 
   return btn;
 }
@@ -220,18 +220,18 @@ function crearBotonAccion(iconoSvg, label) {
   btn.style.width = "32px";
   btn.style.padding = "0";
   btn.style.cursor = "pointer";
-  btn.style.background = "rgba(90, 90, 90, 0.35)";
+  btn.style.background = "rgba(70, 74, 84, 0.78)";
   btn.style.backdropFilter = "blur(8px)";
   btn.style.webkitBackdropFilter = "blur(8px)";
-  btn.style.border = "1px solid #b4f7ff";
+  btn.style.border = "1px solid rgba(180, 247, 255, 0.95)";
   btn.style.borderRadius = "999px";
   btn.style.color = "#fff";
   btn.style.fontSize = "0";
   btn.style.lineHeight = "0";
-  btn.style.opacity = "0.75";
-  btn.style.boxShadow = "0 0 12px rgba(100, 227, 255, 0.18)";
+  btn.style.opacity = "1";
+  btn.style.boxShadow = "0 0 18px rgba(100, 227, 255, 0.35)";
   btn.onmouseenter = () => (btn.style.opacity = "1");
-  btn.onmouseleave = () => (btn.style.opacity = "0.75");
+  btn.onmouseleave = () => (btn.style.opacity = "1");
   return btn;
 }
 
@@ -255,14 +255,14 @@ acciones.append(btnBack, btnHome);
 document.body.appendChild(acciones);
 acciones.style.display = "none";
 
-// Indicador de página
+// Indicador de pÃ¡gina
 const indicadorPagina = document.createElement('span');
 indicadorPagina.style.minWidth = '38px';
 indicadorPagina.style.padding = '4px 6px';
 indicadorPagina.style.fontSize = 'clamp(0.65rem, 1.2vw, 0.75rem)';
 indicadorPagina.style.color = '#fff';
 indicadorPagina.style.fontWeight = '600';
-indicadorPagina.style.background = 'rgba(90,90,90,0.35)';
+indicadorPagina.style.background = 'rgba(70, 74, 84, 0.78)';
 indicadorPagina.style.backdropFilter = 'blur(6px)';
 indicadorPagina.style.borderRadius = '6px';
 indicadorPagina.style.display = 'flex';
@@ -315,7 +315,7 @@ container.addEventListener("touchcancel", () => {
 }, { passive: true });
 
 window.addEventListener("keydown", (e) => {
-  // Atajo rapido para volver al tamaño normal.
+  // Atajo rapido para volver al tamaÃ±o normal.
   if (e.key === "0") {
     zoomScale = 1;
     zoomTarget = 1;
@@ -328,19 +328,19 @@ window.addEventListener("keydown", (e) => {
 async function cargarPDF() {
   pdfDoc = await pdfjsLib.getDocument(url).promise;
   totalPaginas = pdfDoc.numPages;
-  // Mantener proporción real del PDF para evitar distorsión al escalar.
+  // Mantener proporciÃ³n real del PDF para evitar distorsiÃ³n al escalar.
   const probePage = await pdfDoc.getPage(1);
   const probeViewport = probePage.getViewport({ scale: 1 });
   const ratio = probeViewport.width / probeViewport.height;
   pageBaseHeight = 980;
   pageBaseWidth = Math.max(620, Math.round(pageBaseHeight * ratio));
 
-  // Render nítido estable (sin sobreescalado extremo que cause artefactos).
+  // Render nÃ­tido estable (sin sobreescalado extremo que cause artefactos).
   const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   const qualityBoost = window.innerWidth <= 768 ? 2.25 : 1.95;
   const escala = Math.min(4.2, Math.max(1.8, dpr * qualityBoost));
 
-  // Renderizar todas las páginas
+  // Renderizar todas las pÃ¡ginas
   for (let i = 1; i <= totalPaginas; i++) {
     const page = await pdfDoc.getPage(i);
     const viewport = page.getViewport({ scale: escala });
@@ -354,7 +354,7 @@ async function cargarPDF() {
     images.push(canvas.toDataURL("image/png"));
   }
 
-  // Agregar hoja final blanca si número de páginas impar
+  // Agregar hoja final blanca si nÃºmero de pÃ¡ginas impar
   if (totalPaginas % 2 !== 0) {
     const canvasFinal = document.createElement("canvas");
     const lastImg = new Image();
@@ -438,7 +438,7 @@ function iniciarFlipbook() {
     flipTo(currentIndex() + 1);
   }
 
-  // -------------------- Funciones de navegación --------------------
+  // -------------------- Funciones de navegaciÃ³n --------------------
   function avanzarPaginas(n) {
     let target = currentIndex() + n;
     if (target > images.length - 1) target = images.length - 1;
@@ -473,7 +473,7 @@ function iniciarFlipbook() {
     retrocederPaginas(10);
   });
 
-  // Navegación por teclado (desktop): listeners globales y foco persistente.
+  // NavegaciÃ³n por teclado (desktop): listeners globales y foco persistente.
   const onKeyDown = (e) => {
     const active = document.activeElement;
     const isTypingTarget =
@@ -506,9 +506,9 @@ function iniciarFlipbook() {
   container.addEventListener("mouseenter", ensureKeyboardFocus);
   ensureKeyboardFocus();
 
-  // Actualizar indicador de página
+  // Actualizar indicador de pÃ¡gina
   pageFlip.on("flip", (e) => {
-    const index = e.data; // índice interno del flipbook
+    const index = e.data; // Ã­ndice interno del flipbook
     indicadorPagina.textContent = `${index + 1} / ${images.length}`;
   });
 
@@ -531,5 +531,8 @@ cargarPDF().catch((error) => {
   console.error(error);
   showLoader();
 });
+
+
+
 
 

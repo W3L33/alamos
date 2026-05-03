@@ -8,7 +8,7 @@ export const TEAM_COUNT = 8;
 const INTEGRANTES_PER_TEAM = 6;
 
 /** 8 equipos con nombres e integrantes numerados (placeholder). */
-export function getTeamCardPlaceholders() {
+export function getTeamCardPlaceholders(overridesByTeamId = {}) {
   return Array.from({ length: TEAM_COUNT }, (_, i) => {
     const n = i + 1;
     const start = (n - 1) * INTEGRANTES_PER_TEAM + 1;
@@ -16,10 +16,18 @@ export function getTeamCardPlaceholders() {
       { length: INTEGRANTES_PER_TEAM },
       (_, j) => `Integrante ${start + j}`
     );
+    const override = overridesByTeamId?.[n] ?? {};
+    const overrideMembers = Array.isArray(override.integrantes)
+      ? override.integrantes.filter((name) => String(name || "").trim().length > 0)
+      : null;
+    const hideCard = Array.isArray(override.integrantes) && overrideMembers.length === 0;
     return {
       id: n,
-      name: `Equipo ${n}`,
-      integrantesLabel: names.join(", "),
+      name: String(override.name || "").trim() || `Equipo ${n}`,
+      integrantesLabel: overrideMembers?.length
+        ? overrideMembers.join(", ")
+        : names.join(", "),
+      hidden: hideCard,
       imageUrl: DEFAULT_TEAM_IMAGE,
     };
   });

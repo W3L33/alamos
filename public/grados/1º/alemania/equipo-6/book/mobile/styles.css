@@ -1,4 +1,4 @@
-html, body {
+﻿html, body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -144,7 +144,7 @@ footer {
   border: 3px solid #b4f7ff;
   box-sizing: border-box;
   transform-origin: center center;
-  background: rgba(11, 23, 52, 0.92);
+  background: rgba(4, 8, 20, 1);
   box-shadow:
     0 0 20px rgba(100, 227, 255, 0.42),
     inset 0 0 16px rgba(125, 211, 252, 0.06);
@@ -213,7 +213,7 @@ footer {
   flex-shrink: 0;
   border-radius: 50%;
   overflow: hidden;
-  background: #0b1734;
+  background: #040814;
 }
 
 .creator-float__img {
@@ -246,7 +246,7 @@ footer {
   white-space: nowrap;
   font-size: 12px;
   color: #eaf6ff;
-  background: rgba(9, 18, 42, 0.95);
+  background: rgba(4, 8, 20, 1);
   border: 1px solid rgba(147, 197, 253, 0.35);
   border-radius: 999px;
   padding: 6px 10px;
@@ -302,3 +302,6 @@ footer {
     height: 100vh;
   }
 }
+
+
+
