@@ -1,3 +1,45 @@
-node_modules
-dist
+## Dependencies
+node_modules/
+
+## Build output
+dist/
+build/
+coverage/
+.vite/
+
+## Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+## Environment files
+.env
+.env.*
+!.env.example
+
+## OS / editor junk
 .DS_Store
+Thumbs.db
+desktop.ini
+
+## IDE / tooling
+.idea/
+.vscode/
+.cursor/
+
+## Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+Captura de pantalla *
+**/Captura de pantalla *
+
+## Keep this file always versioned
+!_seguimiento.txt
+!**/_seguimiento.txt
