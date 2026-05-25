@@ -207,5 +207,13 @@ footer {
     height: auto;
   }
 }
-
-
+/* --- Alta calidad revista (mobile/desktop) --- */
+#flipbook .stf__item,
+#flipbook .stf__block,
+#flipbook .stf__parent,
+#flipbook img,
+#flipbook canvas {
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
