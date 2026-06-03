@@ -8,21 +8,20 @@
 <link rel="stylesheet" href="styles.css">
 <script>
 (function () {
+  const ua = navigator.userAgent;
+  const touch = navigator.maxTouchPoints > 0;
   const esDesktop =
-    navigator.maxTouchPoints === 0 &&
-    !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    !touch &&
+    !/Android|iPhone|iPad|iPod/i.test(ua) &&
+    window.innerWidth >= 1100;
 
   if (esDesktop) {
-    // 🔒 Bloqueo inmediato
-    window.location.replace('../desktop/index.html');
+    window.location.replace("../desktop/index.html");
   }
 })();
 </script>
-<!-- PDF.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
-
-<!-- Tu JS principal -->
 <script src="main.js" defer></script>
 </head>
 

@@ -1,5 +1,5 @@
 /**
- * Propaga el visor de revistas (main.js + estilos) a todos los equipos.
+ * Propaga el visor de revistas (main.js, index.html, estilos) a todos los equipos.
  */
 import fs from "fs";
 import path from "path";
@@ -9,19 +9,45 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 const gradosRoot = path.join(root, "public/grados");
 const mainTemplate = path.join(__dirname, "templates/book-main.js");
+const indexTemplate = path.join(__dirname, "templates/book-index.html");
+const mobileIndexTemplate = path.join(__dirname, "templates/book-mobile-index.html");
+const desktopIndexTemplate = path.join(__dirname, "templates/book-desktop-index.html");
 const stylesSnippet = path.join(__dirname, "templates/book-styles-snippet.css");
 const STYLE_MARKER = "/* --- Alta calidad revista";
 
 const mainSrc = fs.readFileSync(mainTemplate, "utf8");
+const indexSrc = fs.readFileSync(indexTemplate, "utf8");
+const mobileIndexSrc = fs.readFileSync(mobileIndexTemplate, "utf8");
+const desktopIndexSrc = fs.readFileSync(desktopIndexTemplate, "utf8");
 const styleSrc = fs.readFileSync(stylesSnippet, "utf8");
 
 let mainCount = 0;
+let indexCount = 0;
+let mobileIndexCount = 0;
+let desktopIndexCount = 0;
 let styleCount = 0;
 
 function walk(dir) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
+      if (ent.name === "book") {
+        const indexPath = path.join(full, "index.html");
+        const mobilePath = path.join(full, "mobile", "index.html");
+        const desktopPath = path.join(full, "desktop", "index.html");
+        if (fs.existsSync(indexPath)) {
+          fs.writeFileSync(indexPath, indexSrc, "utf8");
+          indexCount++;
+        }
+        if (fs.existsSync(mobilePath)) {
+          fs.writeFileSync(mobilePath, mobileIndexSrc, "utf8");
+          mobileIndexCount++;
+        }
+        if (fs.existsSync(desktopPath)) {
+          fs.writeFileSync(desktopPath, desktopIndexSrc, "utf8");
+          desktopIndexCount++;
+        }
+      }
       walk(full);
       continue;
     }
@@ -52,5 +78,5 @@ if (!fs.existsSync(gradosRoot)) {
 
 walk(gradosRoot);
 console.log(
-  `[sync-book-viewer] main.js → ${mainCount} archivos, styles.css actualizados → ${styleCount}`
+  `[sync-book-viewer] main.js → ${mainCount}, index.html → ${indexCount}, mobile → ${mobileIndexCount}, desktop → ${desktopIndexCount}, styles → ${styleCount}`
 );

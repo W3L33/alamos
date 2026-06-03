@@ -2,17 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Libro PDF</title>
 <link rel="stylesheet" href="styles.css">
 <script>
 (function () {
+  const ua = navigator.userAgent;
+  const touch = navigator.maxTouchPoints > 0;
   const esMovil =
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-    navigator.maxTouchPoints > 0;
+    /Android|iPhone|iPad|iPod/i.test(ua) ||
+    touch ||
+    window.innerWidth <= 900;
 
   if (esMovil) {
-    // 🔒 Bloqueo inmediato
-    window.location.replace('../mobile/index.html');
+    window.location.replace("../mobile/index.html");
   }
 })();
 </script>

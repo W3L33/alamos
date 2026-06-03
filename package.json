@@ -9,6 +9,7 @@
     "seed:mexico-globe-2-8": "node scripts/seed-mexico-globe-equipos-2-8.mjs",
     "seed:fr-ale-ing-globe": "node scripts/seed-fr-ale-ing-globe-from-mexico1.mjs",
     "dev": "vite",
+    "dev:host": "npm run predev && vite --host",
     "sync:proyecto": "node -e \"const fs=require('fs'); const cp=require('child_process'); const p='scripts/sync-proyecto-static.mjs'; if (fs.existsSync(p)) { const r=cp.spawnSync(process.execPath,[p],{stdio:'inherit'}); process.exit(r.status ?? 1); } console.log('[alamos] sync-proyecto-static.mjs no existe, omito.');\"",
     "photos:manifest": "node scripts/generate-photos-manifest.mjs && node scripts/sync-team-animals-json.mjs",
     "sync:book-viewer": "node scripts/sync-book-viewer.mjs",
