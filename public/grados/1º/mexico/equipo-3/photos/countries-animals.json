@@ -352,7 +352,7 @@
     "vectorFallbackUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/pinguino-imperial-antartida-pinguino.jpg"
   },
   {
-    "photo": "photos/elefante-africano-kenia-elefante.jpg",
+    "photo": "photos/africano-kenia-elefante.jpg",
     "globeCountry": "Kenia",
     "country": "Kenia",
     "lat": -0.0236,
@@ -368,7 +368,7 @@
     "vectorFallbackUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/elefante-africano-kenia-elefante.jpg"
   },
   {
-    "photo": "photos/jaguar-mexico-jaguar.jpg",
+    "photo": "photos/mexico-jaguar.jpg",
     "globeCountry": "México",
     "country": "México",
     "lat": 23.6345,
@@ -380,8 +380,8 @@
     "diet": "Carnívoro, caza mamíferos y reptiles.",
     "size": "Hasta 1.8 metros de largo.",
     "interestingFact": "Su mordida es una de las más fuertes del reino animal.",
-    "imageUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/jaguar-mexico-jaguar.jpg",
-    "vectorFallbackUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/jaguar-mexico-jaguar.jpg"
+    "imageUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/mexico-jaguar.jpg",
+    "vectorFallbackUrl": "/grados/1%C2%BABA/mexico/equipo-1/photos/mexico-jaguar.jpg"
   },
   {
     "photo": "photos/oso-polar-canada-oso.jpg",

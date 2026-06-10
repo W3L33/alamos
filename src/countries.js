@@ -3,7 +3,7 @@ export const COUNTRY_PAGES = {
   mexico: { name: "México", flag: "https://flagcdn.com/w320/mx.png" },
   francia: { name: "Francia", flag: "https://flagcdn.com/w320/fr.png" },
   alemania: { name: "Alemania", flag: "https://flagcdn.com/w320/de.png" },
-  inglaterra: { name: "Inglaterra", flag: "https://flagcdn.com/w320/gb.png" },
+  inglaterra: { name: "Inglaterra", flag: "https://flagcdn.com/w320/gb-eng.png" },
   italia: { name: "Italia", flag: "https://flagcdn.com/w320/it.png" },
   belgica: { name: "Bélgica", flag: "https://flagcdn.com/w320/be.png" },
   brasil: { name: "Brasil", flag: "https://flagcdn.com/w320/br.png" },
