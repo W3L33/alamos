@@ -1,18 +1,19 @@
 [
+
   {
-    "photo": "photos/mexico-jaguar.jpg",
+    "photo": "photos/Mexico-flamingo.jpg",
     "globeCountry": "Mexico",
     "country": "México",
-    "lat": 23.6345,
-    "lon": -102.5528,
-    "animal": "Jaguar",
-    "animalDescription": "El jaguar es el felino más grande de América y uno de los depredadores más poderosos del continente. Se caracteriza por su pelaje amarillo con manchas negras en forma de rosetas y por su mordida extremadamente fuerte.",
-    "countryDescription": "México es un país de América del Norte famoso por su rica biodiversidad y sus antiguas culturas como la maya y la azteca. Alberga selvas tropicales y una gran variedad de especies animales emblemáticas.",
-    "habitat": "Selvas tropicales, bosques húmedos y áreas montañosas de México y Centroamérica.",
-    "diet": "Carnívoro. Caza mamíferos como venados, pecaríes y monos, además de reptiles y peces.",
-    "size": "Hasta 1.8 metros de longitud (incluyendo la cola) y un peso de 50 a 100 kg.",
-    "interestingFact": "El jaguar tiene la mordida más fuerte de todos los felinos del mundo en relación a su tamaño, capaz de perforar el cráneo de sus presas.",
-    "imageUrl": "/grados/1%C2%BA/inglaterra/equipo-1/photos/mexico-jaguar.jpg",
-    "vectorFallbackUrl": "/grados/1%C2%BA/inglaterra/equipo-1/photos/mexico-jaguar.jpg"
+    "lat": 20.5,
+    "lon": -88.0,
+    "animal": "Flamenco",
+    "animalDescription": "El flamenco es un ave elegante de patas largas y cuello curvado. Su color rosado proviene de los pigmentos presentes en los alimentos que consume.",
+    "countryDescription": "México alberga humedales y costas donde habitan aves llamativas como el flamenco.",
+    "habitat": "Lagunas costeras, estuarios, lagos salados y humedales.",
+    "diet": "Pequeños crustáceos, algas y larvas de insectos filtradas del agua.",
+    "size": "Puede medir entre 1,2 y 1,5 metros de altura.",
+    "interestingFact": "Suele dormir apoyado en una sola pata para conservar calor corporal.",
+    "imageUrl": "/grados/1%C2%BA/inglaterra/equipo-5/photos/Mexico-flamingo.jpg",
+    "vectorFallbackUrl": "/grados/1%C2%BA/inglaterra/equipo-5/photos/Mexico-flamingo.jpg"
   }
 ]
